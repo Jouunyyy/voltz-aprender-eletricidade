@@ -114,6 +114,7 @@ export default function FullVoltzApp({user,signInPath,signOutPath}:{user:User;si
   const [missedCurrent,setMissedCurrent]=useState(false);
   const [finished,setFinished]=useState(false);
   const [manualStep,setManualStep]=useState(0);
+  const [resetOpen,setResetOpen]=useState(false);
   useEffect(()=>{try{const saved=localStorage.getItem(storageKey);if(saved)setData(JSON.parse(saved))}catch{}},[]);
   async function save(next:Data){setData(next);try{localStorage.setItem(storageKey,JSON.stringify(next))}catch{}}
   const manualRead=data.completedLessons.includes("manual-iniciacao");
@@ -177,18 +178,19 @@ export default function FullVoltzApp({user,signInPath,signOutPath}:{user:User;si
   function openManual(){setManualStep(0);setView("manual")}
   function openCurrent(){if(!manualRead){openManual();return}const item=allLevels[currentIndex];setCategoryIndex(categories.findIndex(x=>x.id===item.category.id));openLevel(item)}
   function completeManual(){if(!manualRead)void save({...data,completedLessons:[...data.completedLessons,"manual-iniciacao"]});setView("percurso")}
-  function resetProgress(){if(!window.confirm("Queres apagar todo o progresso guardado neste navegador?"))return;localStorage.removeItem(storageKey);setData(initial);setSelected(allLevels[0]);setCategoryIndex(0);setView("percurso")}
+  function resetProgress(){localStorage.removeItem(storageKey);setData(initial);setSelected(allLevels[0]);setCategoryIndex(0);setManualStep(0);setSlide(0);setQuiz([]);setQuestion(0);setAnswer(null);setScore(0);setFinished(false);setResetOpen(false);setView("percurso")}
   const nav=(target:View)=>{if(target==="desafio")startChallenge();else setView(target)};
   return <div className="app-shell course-app">
     <aside className="sidebar"><button className="brand" onClick={()=>setView("percurso")}><span><Zap fill="currentColor"/></span>Voltz</button><nav><Nav active={view==="percurso"} icon={<Home/>} label="Percurso" onClick={()=>nav("percurso")}/><Nav active={view==="manual"} icon={<BookOpen/>} label="Manual" onClick={openManual}/><Nav active={view==="aula"} icon={<Gauge/>} label="Aula visual" onClick={openCurrent}/><Nav active={view==="desafio"} icon={<Trophy/>} label="Desafio" onClick={startChallenge}/><Nav active={view==="perfil"} icon={<UserRound/>} label="Perfil" onClick={()=>nav("perfil")}/></nav><div className="sidebar-foot"><ShieldCheck/> Formação introdutória baseada em prática portuguesa</div></aside>
-    <main className="main"><header className="topbar"><div className="mobile-brand"><Zap fill="currentColor"/> Voltz</div><span className="version-badge">v2.8 · circuitos nos desafios</span><div className="stat flame"><Flame/><strong>{data.streak}</strong><span>dias</span></div><div className="stat"><Zap/><strong>{data.xp}</strong><span>XP</span></div><button className="avatar" aria-label="Abrir perfil" onClick={()=>setView("perfil")}>{user?.name?.[0]?.toUpperCase()||"A"}</button></header>
+    <main className="main"><header className="topbar"><div className="mobile-brand"><Zap fill="currentColor"/> Voltz</div><span className="version-badge">v2.9 · auditoria sem bloqueios</span><div className="stat flame"><Flame/><strong>{data.streak}</strong><span>dias</span></div><div className="stat"><Zap/><strong>{data.xp}</strong><span>XP</span></div><button className="avatar" aria-label="Abrir perfil" onClick={()=>setView("perfil")}>{user?.name?.[0]?.toUpperCase()||"A"}</button></header>
       {view==="percurso"&&<Journey data={data} user={user} signInPath={signInPath} categoryIndex={categoryIndex} setCategoryIndex={setCategoryIndex} openLevel={openLevel} openCurrent={openCurrent} openManual={openManual}/>} 
       {view==="manual"&&<Manual step={manualStep} setStep={setManualStep} done={manualRead} complete={completeManual}/>} 
       {view==="aula"&&<Lesson level={selected} slide={slide} setSlide={setSlide} startChallenge={startChallenge}/>} 
       {view==="desafio"&&<Challenge quiz={quiz.length?quiz:buildQuiz(selected)} question={question} answer={answer} score={score} finished={finished} choose={choose} retry={retryQuestion} next={nextQuestion} reset={startChallenge} continueCourse={continueCourse}/>} 
-      {view==="perfil"&&<Profile user={user} data={data} signInPath={signInPath} signOutPath={signOutPath} resetProgress={resetProgress}/>} 
+      {view==="perfil"&&<Profile user={user} data={data} signInPath={signInPath} signOutPath={signOutPath} resetProgress={()=>setResetOpen(true)}/>} 
     </main>
     <nav className="mobile-nav five-items" aria-label="Navegação principal"><Nav active={view==="percurso"} icon={<Home/>} label="Percurso" onClick={()=>nav("percurso")}/><Nav active={view==="manual"} icon={<BookOpen/>} label="Manual" onClick={openManual}/><Nav active={view==="aula"} icon={<Gauge/>} label="Aula" onClick={openCurrent}/><Nav active={view==="desafio"} icon={<Trophy/>} label="Desafio" onClick={startChallenge}/><Nav active={view==="perfil"} icon={<UserRound/>} label="Perfil" onClick={()=>nav("perfil")}/></nav>
+    {resetOpen&&<div className="modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setResetOpen(false)}}><section className="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="reset-title" aria-describedby="reset-description"><div className="modal-icon"><ShieldCheck/></div><h2 id="reset-title">Reiniciar todo o progresso?</h2><p id="reset-description">Esta ação apaga o manual lido, XP e níveis concluídos guardados neste navegador. Não pode ser anulada.</p><div className="modal-actions"><button className="ghost-button" onClick={()=>setResetOpen(false)}>Cancelar</button><button className="danger-button" onClick={resetProgress}>Apagar progresso</button></div></section></div>}
   </div>
 }
 
