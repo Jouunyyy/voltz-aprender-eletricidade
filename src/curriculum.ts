@@ -1,4 +1,4 @@
-export type Check = { q: string; options: [string, string, string]; answer: number };
+export type Check = { q: string; options: [string, string, string]; answer: number; explanation?: string };
 export type CourseLevel = { id: string; title: string; objective: string; theory: string; practice: string; formula?: string };
 export type Category = { id: string; name: string; role: string; color: string; levels: CourseLevel[]; checks: Check[] };
 
