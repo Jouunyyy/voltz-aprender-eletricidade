@@ -207,6 +207,9 @@ button { color: inherit; }
   .result-page{min-height:calc(100dvh - 130px);padding-top:16px}.result-card{padding:28px 18px;border-radius:23px}.trophy{width:72px;height:72px;margin-bottom:16px}.trophy svg{width:36px}.result-card h1{font-size:32px;margin:12px 0}.reward-row{gap:9px;margin:22px 0}.reward-row>div{padding:15px 8px}.result-actions{display:grid}.result-actions>*{width:100%}
   .profile-hero{display:grid;padding:22px;border-radius:22px;gap:14px}.profile-avatar{width:66px;height:66px;border-radius:19px;font-size:28px}.profile-hero h1{font-size:29px;margin:5px 0}.profile-hero p{font-size:13px;overflow-wrap:anywhere;margin:0}.stats-grid{gap:10px;margin:14px 0}.stats-grid>div{padding:16px 18px;border-radius:17px}.progress-panel{padding:20px;border-radius:20px}.progress-panel .section-head{display:flex}.progress-panel .section-head h2{font-size:19px}
 }
+.version-badge{margin-right:auto;background:#e9f2ff;color:#075eca;border:1px solid #c9ddff;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900;white-space:nowrap}
+.reset-progress{margin-top:18px;min-height:44px;padding:0 16px;border:2px solid #e14b61;border-radius:13px;background:#fff;color:#b6253a;font-weight:900;cursor:pointer}
+@media(max-width:680px){.version-badge{position:absolute;left:50%;transform:translateX(-50%);font-size:10px;padding:5px 8px}.mobile-brand{margin-right:0}}
 
 @media(max-width:360px){
   .mobile-brand{font-size:0}.mobile-brand svg{margin-right:0}.topbar{gap:9px}
