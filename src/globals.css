@@ -209,7 +209,9 @@ button { color: inherit; }
 }
 .version-badge{margin-right:auto;background:#e9f2ff;color:#075eca;border:1px solid #c9ddff;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900;white-space:nowrap}
 .reset-progress{margin-top:18px;min-height:44px;padding:0 16px;border:2px solid #e14b61;border-radius:13px;background:#fff;color:#b6253a;font-weight:900;cursor:pointer}
+.email-panel{margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:24px;padding:25px;display:flex;gap:18px}.email-panel-icon{width:52px;height:52px;flex:0 0 52px;border-radius:16px;background:#fff4bd;color:#c28e00;display:grid;place-items:center}.email-panel-icon svg{width:25px}.email-panel-copy{flex:1;min-width:0}.email-panel h2{margin:6px 0 8px;font-size:22px}.email-panel-copy>p{color:#6c7c91;line-height:1.55;font-size:14px}.email-consent{margin:18px 0;display:flex;align-items:flex-start;gap:12px;background:#f3f7fc;border-radius:16px;padding:15px;cursor:pointer}.email-consent input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--blue)}.email-consent span{display:grid;gap:4px}.email-consent strong{font-size:14px}.email-consent small{color:#75859a;line-height:1.4}.email-test{display:inline-flex;align-items:center;gap:8px}.email-test svg{width:18px}.email-success,.email-error{margin:12px 0 0!important;font-weight:800}.email-success{color:#138455!important}.email-error{color:#c92e47!important}
 @media(max-width:680px){.version-badge{position:absolute;left:50%;transform:translateX(-50%);font-size:10px;padding:5px 8px}.mobile-brand{margin-right:0}}
+@media(max-width:560px){.email-panel{padding:20px;display:grid}.email-panel h2{font-size:20px}.email-test{width:100%;justify-content:center}.email-panel-icon{width:46px;height:46px}}
 
 @media(max-width:360px){
   .mobile-brand{font-size:0}.mobile-brand svg{margin-right:0}.topbar{gap:9px}
