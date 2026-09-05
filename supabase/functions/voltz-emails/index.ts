@@ -135,13 +135,13 @@ async function rest(path: string, init: RequestInit = {}) {
   return response;
 }
 
-async function sendEmail(to: string, subject: string, html: string) {
+async function sendEmail(to: string, subject: string, html: string, test = false) {
   if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY não configurada");
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      from: "Faísca do Voltz <voltz@midiahost.pt>",
+      from: test ? "Voltz Teste <onboarding@resend.dev>" : "Faísca do Voltz <voltz@midiahost.pt>",
       reply_to: "voltz@midiahost.pt",
       to: [to],
       subject,
@@ -261,7 +261,7 @@ Deno.serve(async (request) => {
       if (preferences.test_sent_at && Date.now() - new Date(preferences.test_sent_at).getTime() < 10 * 60 * 1000) return new Response(JSON.stringify({ error: "Aguarda 10 minutos antes de repetir o teste" }), { status: 429, headers: jsonHeaders });
       const completed = await completedCount(user.id);
       const available = templates(preferences, completed);
-      for (const template of Object.values(available)) await sendEmail(preferences.email, `[TESTE] ${template.subject}`, template.html);
+      for (const template of Object.values(available)) await sendEmail(preferences.email, `[TESTE] ${template.subject}`, template.html, true);
       await rest(`email_preferences?user_id=eq.${user.id}`, { method: "PATCH", body: JSON.stringify({ test_sent_at: new Date().toISOString() }) });
       return new Response(JSON.stringify({ sent: 3, to: preferences.email }), { headers: jsonHeaders });
     }
