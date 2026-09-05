@@ -3,17 +3,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { Award, BellRing, BookOpen, Check, ChevronRight, Flame, Gauge, Home, LockKeyhole, Mail, ShieldCheck, Sparkles, Star, Trophy, UserRound, X, Zap } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { allLevels, categories, type Check, type CourseLevel } from "./curriculum";
+import { allLevels, categories, type Check as QuizCheck, type CourseLevel } from "./curriculum";
 
-type View="percurso"|"manual"|"aula"|"desafio"|"perfil";
+import { buildQuiz, shuffleCheck } from "./quiz";
+import VoltzLive from "./voltz-live";
+
+type View="percurso"|"manual"|"aula"|"desafio"|"perfil"|"live";
 type User={id:string;name:string;email:string;avatar?:string};
 type Data={xp:number;level:number;streak:number;completedLessons:string[]};
 const initial:Data={xp:0,level:1,streak:0,completedLessons:[]};
 const legacyStorageKey="voltz-progress-v1";
 const asset=(name:string)=>`${import.meta.env.BASE_URL}${name}`;
 const lowerFirst=(text:string)=>text.charAt(0).toLocaleLowerCase("pt-PT")+text.slice(1);
-const shuffle=<T,>(items:T[])=>{const out=[...items];for(let i=out.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[out[i],out[j]]=[out[j],out[i]]}return out};
-const shuffleCheck=(item:Check)=>{const correct=item.options[item.answer];const options=shuffle([...item.options]) as [string,string,string];return {...item,options,answer:options.indexOf(correct)}};
 const xpForScore=(score:number)=>score===10?250:score===9?225:score===8?200:0;
 const photos:Record<string,{src:string;alt:string;caption:string;credit:string;href:string}>={
   "aprendiz-1":{src:"https://www.foxvalleymetrology.com/wp-content/uploads/2025/08/img_3451-min-scaled.jpg",alt:"Multímetro digital com pontas de prova ligadas aos bornes corretos",caption:"V, A e Ω aparecem no seletor e nos bornes de um multímetro real",credit:"Fox Valley Metrology",href:"https://www.foxvalleymetrology.com/blog/how-to-use-a-multimeter/"},
@@ -103,12 +104,13 @@ const teaching:Record<string,Teaching>={
 
 export default function FullVoltzApp({user,loadRemote,saveRemote,emailConsent,emailPreferencesReady,onEmailConsent,onSendEmailTests,onSignOut}:{user:User;loadRemote:()=>Promise<Data|null>;saveRemote:(data:Data)=>Promise<void>;emailConsent:boolean;emailPreferencesReady:boolean;onEmailConsent:(consent:boolean)=>Promise<void>;onSendEmailTests:()=>Promise<{sent:number;to:string}>;onSignOut:()=>void}){
   const storageKey=`voltz-progress-v1:${user.id}`;
-  const [view,setView]=useState<View>("percurso");
+  const [view,rawSetView]=useState<View>(new URLSearchParams(location.search).has("live")?"live":"percurso");
   const [data,setData]=useState<Data>(initial);
   const [categoryIndex,setCategoryIndex]=useState(0);
+  function setView(target:View){if(view==="live"&&target!=="live"){window.dispatchEvent(new CustomEvent("voltz-live-exit",{detail:target}));return}rawSetView(target)}
   const [selected,setSelected]=useState(allLevels[0]);
   const [slide,setSlide]=useState(0);
-  const [quiz,setQuiz]=useState<Check[]>([]);
+  const [quiz,setQuiz]=useState<QuizCheck[]>([]);
   const [question,setQuestion]=useState(0);
   const [answer,setAnswer]=useState<number|null>(null);
   const [score,setScore]=useState(0);
@@ -123,54 +125,6 @@ export default function FullVoltzApp({user,loadRemote,saveRemote,emailConsent,em
   const currentIndex=Math.min(completedCount,allLevels.length-1);
   const isUnlocked=(id:string)=>manualRead&&allLevels.findIndex(x=>x.id===id)<=completedCount;
   function openLevel(level:typeof allLevels[number]){if(!isUnlocked(level.id))return;setSelected(level);setSlide(0);setView("aula")}
-  function buildQuiz(level:typeof allLevels[number]){const others=shuffle(level.category.levels.filter(x=>x.id!==level.id));const objectives=others.map(x=>x.objective);const theories=others.map(x=>x.theory);const practices=others.map(x=>x.practice);const correctTheory=level.theory;const correctPractice=level.practice;const formula=level.formula||`Princípio: ${level.title}`;const checks:Check[]=[
-    {q:`Qual é o objetivo do nível “${level.title}”?`,options:[level.objective,objectives[0],objectives[1]],answer:0,explanation:`O objetivo é ${level.objective.toLowerCase()}`},
-    {q:`Que afirmação descreve corretamente “${level.title}”?`,options:[correctTheory,theories[0],theories[1]],answer:0,explanation:correctTheory},
-    {q:"Qual destas tarefas aplica diretamente o que acabaste de aprender?",options:[correctPractice,practices[0],practices[1]],answer:0,explanation:`A aplicação proposta na aula é: ${correctPractice}`},
-    {q:"Que relação ou princípio deves recordar neste nível?",options:[formula,others[0].formula||others[0].title,others[1].formula||others[1].title],answer:0,explanation:`A referência apresentada na aula é “${formula}”.`},
-    {q:`Que par pertence ao mesmo nível?`,options:[`${level.title} — ${level.objective}`,`${level.title} — ${objectives[2]}`,`${others[2].title} — ${level.objective}`],answer:0,explanation:`“${level.title}” está ligado ao objetivo “${level.objective}”.`},
-    {q:"Antes de escolher uma resposta, o que deves conseguir explicar?",options:[correctTheory,theories[2],theories[3]],answer:0,explanation:`A ideia essencial é: ${correctTheory}`},
-    {q:"Qual é o exemplo prático correto para este conceito?",options:[correctPractice,practices[2],practices[3]],answer:0,explanation:`Este exemplo verifica o conceito: ${correctPractice}`},
-    {q:`Qual destas sínteses corresponde a “${level.title}”?`,options:[`${level.objective} ${correctTheory}`,`${objectives[4]} ${theories[4]}`,`${objectives[5]} ${theories[5]}`],answer:0,explanation:`A síntese junta o objetivo e o princípio explicados nesta aula.`},
-    {q:"Que evidência mostra que compreendeste este nível?",options:[`Conseguir explicar o princípio e aplicá-lo: ${correctPractice}`,`Memorizar apenas o título “${level.title}”`,`Escolher uma opção sem justificar`],answer:0,explanation:"Compreender significa explicar o princípio e aplicá-lo a um caso, não apenas memorizar."},
-    {q:"Qual é a conclusão tecnicamente coerente com a aula?",options:[correctTheory,theories[6],theories[7]],answer:0,explanation:correctTheory}
-  ];if(level.id==="aprendiz-1")checks.splice(4,4,
-    {q:"Uma fonte de 12 V alimenta uma resistência de 6 Ω. Qual é a corrente?",options:["2 A","6 A","72 A"],answer:0,explanation:"Pela Lei de Ohm, I = U ÷ R = 12 ÷ 6 = 2 A."},
-    {q:"Para procurar a tensão indicada numa tomada de um painel didático, que grandeza selecionas?",options:["V — tensão","A — corrente","Ω — resistência"],answer:0,explanation:"A tensão é medida em volt e identificada por V. O procedimento real exige equipamento e competência adequados."},
-    {q:"O visor indica 2 A. Que grandeza foi medida?",options:["Corrente","Tensão","Resistência"],answer:0,explanation:"Ampere, símbolo A, é a unidade da corrente elétrica."},
-    {q:"Mantendo 12 V, a resistência passa de 6 Ω para 12 Ω. O que acontece à corrente no modelo simples?",options:["Diminui para 1 A","Aumenta para 4 A","Mantém-se em 2 A"],answer:0,explanation:"I = 12 ÷ 12 = 1 A. Com a mesma tensão, aumentar a resistência reduz a corrente."}
-  );if(level.id==="aprendiz-2")checks.splice(4,4,
-    {q:"Uma carga resistiva ideal tem 24 V e 12 Ω. Qual é a corrente?",options:["2 A","0,5 A","288 A"],answer:0,explanation:"I = U ÷ R = 24 ÷ 12 = 2 A."},
-    {q:"Mantendo R = 10 Ω, a tensão sobe de 10 V para 20 V. O que acontece à corrente?",options:["Duplica, de 1 A para 2 A","Reduz para metade","Não muda"],answer:0,explanation:"I = U ÷ R. Com resistência constante, duplicar a tensão duplica a corrente."},
-    {q:"Mantendo U = 12 V, a resistência sobe de 6 Ω para 12 Ω. Qual é a nova corrente?",options:["1 A","2 A","12 A"],answer:0,explanation:"I = 12 ÷ 12 = 1 A; duplicar a resistência reduz a corrente para metade."},
-    {q:"Queres calcular resistência conhecendo tensão e corrente. Que forma usas?",options:["R = U ÷ I","R = U × I","R = I ÷ U"],answer:0,explanation:"Reorganizando U = R × I, obtém-se R = U ÷ I."}
-  );if(level.id==="aprendiz-3")checks.splice(4,4,
-    {q:"Um aquecedor de 1,5 kW funciona durante 3 h. Quanta energia utiliza?",options:["4,5 kWh","2 kWh","0,5 kWh"],answer:0,explanation:"E = P × t = 1,5 × 3 = 4,5 kWh."},
-    {q:"Dois aparelhos usam 2 kWh. Um funciona 2 h e outro 1 h. Qual tem maior potência?",options:["O que funciona apenas 1 h","O que funciona 2 h","Têm obrigatoriamente a mesma potência"],answer:0,explanation:"Para usar a mesma energia em menos tempo, o segundo aparelho tem maior potência: 2 kW em vez de 1 kW."},
-    {q:"Uma carga de 2 kW funciona durante 30 minutos. Qual é a energia?",options:["1 kWh","4 kWh","60 kWh"],answer:0,explanation:"30 minutos são 0,5 h. E = 2 × 0,5 = 1 kWh."},
-    {q:"Um equipamento usa 6 kWh em 3 h. Qual foi a potência média no modelo?",options:["2 kW","18 kW","0,5 kW"],answer:0,explanation:"P = E ÷ t = 6 ÷ 3 = 2 kW."}
-  );if(level.id==="aprendiz-4")checks.splice(2,6,
-    {q:"A forma de onda sobe e desce, atravessando o zero periodicamente. Que tipo representa?",options:["CA","CC","Uma resistência"],answer:0,explanation:"Uma grandeza que alterna periodicamente de sentido é corrente alternada.",visual:"ac-wave"},
-    {q:"A linha mantém polaridade e valor no mesmo sentido. Que tipo representa?",options:["CC","CA","Frequência"],answer:0,explanation:"A corrente contínua mantém polaridade definida.",visual:"dc-line"},
-    {q:"Como classificas normalmente a rede doméstica portuguesa e uma bateria?",options:["Rede: CA; bateria: CC","Rede: CC; bateria: CA","Ambas são sempre CA"],answer:0,explanation:"A rede doméstica fornece CA; uma bateria fornece CC.",visual:"ac-dc-devices"},
-    {q:"O que significa 50 Hz na rede de CA?",options:["50 ciclos por segundo","50 volts por ciclo","50 mudanças de aparelho"],answer:0,explanation:"Hertz mede frequência: 50 Hz correspondem a 50 ciclos por segundo."},
-    {q:"Que símbolo procuras para identificar tensão alternada num aparelho?",options:["V~","V⎓","Ω"],answer:0,explanation:"O til ~ identifica grandeza alternada; o símbolo ⎓ identifica contínua."},
-    {q:"Uma saída USB fornece normalmente que tipo de tensão?",options:["CC","CA a 50 Hz","Nenhuma das duas"],answer:0,explanation:"A saída USB fornece tensão contínua regulada."}
-  );if(level.id==="aprendiz-5")checks.splice(2,6,
-    {q:"Neste esquema, o interruptor está fechado. O que acontece à lâmpada?",options:["Acende, porque existe percurso fechado","Apaga, porque falta neutro","Nada, porque a proteção impede corrente"],answer:0,explanation:"Com fonte, proteção, comando fechado, carga e retorno, o percurso fica completo.",visual:"closed-circuit"},
-    {q:"O interruptor cria uma abertura no condutor ativo. Qual é o resultado?",options:["A corrente é interrompida e a lâmpada apaga","A corrente aumenta","O neutro transforma-se em fase"],answer:0,explanation:"Abrir o comando interrompe o percurso da corrente até à carga.",visual:"open-circuit"},
-    {q:"Que elementos completam o percurso funcional mostrado?",options:["L até à carga e N no retorno","Apenas PE","Dois condutores PE"],answer:0,explanation:"No modelo monofásico, L alimenta a carga através do comando e N completa o retorno.",visual:"closed-circuit"},
-    {q:"Se existir tensão mas o interruptor estiver aberto, há corrente contínua pela lâmpada?",options:["Não","Sim, sempre","Só porque existe proteção"],answer:0,explanation:"A tensão pode existir a montante do interruptor, mas o percurso aberto impede corrente na carga.",visual:"open-circuit"},
-    {q:"Qual é a função do dispositivo antes do interruptor neste esquema?",options:["Proteção do circuito","Produzir luz","Substituir o neutro"],answer:0,explanation:"O dispositivo de proteção está a montante do comando e da carga.",visual:"closed-circuit"},
-    {q:"Onde deve atuar o interruptor neste modelo introdutório?",options:["No condutor ativo L antes da carga","No PE","Em paralelo direto com a fonte"],answer:0,explanation:"O comando da iluminação atua no condutor ativo que alimenta a carga.",visual:"open-circuit"}
-  );if(level.id==="aprendiz-6")checks.splice(2,6,
-    {q:"L1 abriu neste circuito em série. O que acontece a L2?",options:["L2 apaga","L2 fica mais forte","L2 mantém-se igual"],answer:0,explanation:"Em série existe um único percurso; abrir L1 interrompe-o para todos os elementos.",visual:"series-open"},
-    {q:"L1 abriu num ramo paralelo. O que acontece a L2?",options:["L2 pode continuar ligada","L2 apaga sempre","A fonte deixa de ter tensão"],answer:0,explanation:"O ramo de L2 continua a formar um percurso fechado independente.",visual:"parallel-open"},
-    {q:"Qual dos dois desenhos representa uma associação em paralelo?",options:["O desenho com dois ramos","O desenho com um único percurso","Nenhum"],answer:0,explanation:"Em paralelo, cada carga ocupa um ramo entre os mesmos dois pontos.",visual:"series-parallel"},
-    {q:"Que grandeza é comum às duas lâmpadas ligadas em série?",options:["A corrente","A tensão individual","A potência"],answer:0,explanation:"Num circuito em série, a mesma corrente atravessa os elementos.",visual:"series-open"},
-    {q:"Que grandeza é comum aos ramos do circuito em paralelo?",options:["A tensão","A corrente de cada carga obrigatoriamente","A resistência"],answer:0,explanation:"Os ramos ligados aos mesmos dois pontos têm a mesma tensão.",visual:"parallel-open"},
-    {q:"Porque são as cargas domésticas normalmente ligadas em paralelo?",options:["Recebem a tensão prevista e funcionam de forma independente","Precisam da mesma corrente em sequência","Uma avaria deve desligar todas"],answer:0,explanation:"A ligação em paralelo permite funcionamento independente à tensão do circuito.",visual:"series-parallel"}
-  );return shuffle(checks).map(shuffleCheck)}
   function startChallenge(){if(!manualRead){openManual();return}setQuiz(buildQuiz(selected));setQuestion(0);setAnswer(null);setScore(0);setMissedCurrent(false);setFinished(false);setView("desafio")}
   function choose(i:number){if(answer!==null)return;setAnswer(i);if(i===quiz[question].answer&&!missedCurrent)setScore(s=>s+1);if(i!==quiz[question].answer)setMissedCurrent(true)}
   function retryQuestion(){setQuiz(qs=>qs.map((x,i)=>i===question?shuffleCheck(x):x));setAnswer(null)}
@@ -182,15 +136,16 @@ export default function FullVoltzApp({user,loadRemote,saveRemote,emailConsent,em
   function resetProgress(){localStorage.removeItem(storageKey);setData(initial);void saveRemote(initial);setSelected(allLevels[0]);setCategoryIndex(0);setManualStep(0);setSlide(0);setQuiz([]);setQuestion(0);setAnswer(null);setScore(0);setFinished(false);setResetOpen(false);setView("percurso")}
   const nav=(target:View)=>{if(target==="desafio")startChallenge();else setView(target)};
   return <div className="app-shell course-app">
-    <aside className="sidebar"><button className="brand" onClick={()=>setView("percurso")}><span><Zap fill="currentColor"/></span>Voltz</button><nav><Nav active={view==="percurso"} icon={<Home/>} label="Percurso" onClick={()=>nav("percurso")}/><Nav active={view==="manual"} icon={<BookOpen/>} label="Manual" onClick={openManual}/><Nav active={view==="aula"} icon={<Gauge/>} label="Aula visual" onClick={openCurrent}/><Nav active={view==="desafio"} icon={<Trophy/>} label="Desafio" onClick={startChallenge}/><Nav active={view==="perfil"} icon={<UserRound/>} label="Perfil" onClick={()=>nav("perfil")}/></nav><div className="sidebar-foot"><ShieldCheck/> Formação introdutória baseada em prática portuguesa</div></aside>
+    <aside className="sidebar"><button className="brand" onClick={()=>setView("percurso")}><span><Zap fill="currentColor"/></span>Voltz</button><nav><Nav active={view==="percurso"} icon={<Home/>} label="Percurso" onClick={()=>nav("percurso")}/><Nav active={view==="manual"} icon={<BookOpen/>} label="Manual" onClick={openManual}/><Nav active={view==="aula"} icon={<Gauge/>} label="Aula visual" onClick={openCurrent}/><Nav active={view==="desafio"} icon={<Trophy/>} label="Desafio" onClick={startChallenge}/><Nav active={view==="live"} icon={<Zap/>} label="Voltz Live" onClick={()=>nav("live")}/><Nav active={view==="perfil"} icon={<UserRound/>} label="Perfil" onClick={()=>nav("perfil")}/></nav><div className="sidebar-foot"><ShieldCheck/> Formação introdutória baseada em prática portuguesa</div></aside>
     <main className="main"><header className="topbar"><div className="mobile-brand"><Zap fill="currentColor"/> Voltz</div><span className="version-badge">v3.1 · emails da Faísca</span><div className="stat flame"><Flame/><strong>{data.streak}</strong><span>dias</span></div><div className="stat"><Zap/><strong>{data.xp}</strong><span>XP</span></div><button className="avatar" aria-label="Abrir perfil" onClick={()=>setView("perfil")}>{user.avatar?<img src={user.avatar} alt="" referrerPolicy="no-referrer"/>:user.name[0]?.toUpperCase()||"A"}</button></header>
       {view==="percurso"&&<Journey data={data} user={user} categoryIndex={categoryIndex} setCategoryIndex={setCategoryIndex} openLevel={openLevel} openCurrent={openCurrent} openManual={openManual}/>} 
       {view==="manual"&&<Manual step={manualStep} setStep={setManualStep} done={manualRead} complete={completeManual}/>} 
       {view==="aula"&&<Lesson level={selected} slide={slide} setSlide={setSlide} startChallenge={startChallenge}/>} 
       {view==="desafio"&&<Challenge quiz={quiz.length?quiz:buildQuiz(selected)} question={question} answer={answer} score={score} finished={finished} choose={choose} retry={retryQuestion} next={nextQuestion} reset={startChallenge} continueCourse={continueCourse}/>} 
+      {view==="live"&&<VoltzLive user={user} onExit={target=>rawSetView((target||"percurso") as View)} renderVisual={kind=><QuestionVisual kind={kind}/>}/>}
       {view==="perfil"&&<Profile user={user} data={data} emailConsent={emailConsent} emailPreferencesReady={emailPreferencesReady} onEmailConsent={onEmailConsent} onSendEmailTests={onSendEmailTests} resetProgress={()=>setResetOpen(true)} onSignOut={onSignOut}/>}
     </main>
-    <nav className="mobile-nav five-items" aria-label="Navegação principal"><Nav active={view==="percurso"} icon={<Home/>} label="Percurso" onClick={()=>nav("percurso")}/><Nav active={view==="manual"} icon={<BookOpen/>} label="Manual" onClick={openManual}/><Nav active={view==="aula"} icon={<Gauge/>} label="Aula" onClick={openCurrent}/><Nav active={view==="desafio"} icon={<Trophy/>} label="Desafio" onClick={startChallenge}/><Nav active={view==="perfil"} icon={<UserRound/>} label="Perfil" onClick={()=>nav("perfil")}/></nav>
+    <nav className="mobile-nav six-items" aria-label="Navegação principal"><Nav active={view==="percurso"} icon={<Home/>} label="Percurso" onClick={()=>nav("percurso")}/><Nav active={view==="manual"} icon={<BookOpen/>} label="Manual" onClick={openManual}/><Nav active={view==="aula"} icon={<Gauge/>} label="Aula" onClick={openCurrent}/><Nav active={view==="desafio"} icon={<Trophy/>} label="Desafio" onClick={startChallenge}/><Nav active={view==="live"} icon={<Zap/>} label="Voltz Live" onClick={()=>nav("live")}/><Nav active={view==="perfil"} icon={<UserRound/>} label="Perfil" onClick={()=>nav("perfil")}/></nav>
     {resetOpen&&<div className="modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setResetOpen(false)}}><section className="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="reset-title" aria-describedby="reset-description"><div className="modal-icon"><ShieldCheck/></div><h2 id="reset-title">Reiniciar todo o progresso?</h2><p id="reset-description">Esta ação apaga o manual lido, XP e níveis concluídos da tua conta em todos os dispositivos. Não pode ser anulada.</p><div className="modal-actions"><button className="ghost-button" onClick={()=>setResetOpen(false)}>Cancelar</button><button className="danger-button" onClick={resetProgress}>Apagar progresso</button></div></section></div>}
   </div>
 }
@@ -261,12 +216,12 @@ function TechnicalVisual({level,guide}:{level:CourseLevel;guide:Teaching}){
   return <div className="level-diagram concept-flow" role="img" aria-label={`Esquema técnico de ${level.title}: ${guide.labels.join(", ")}`}><small>{level.category.name} · esquema do nível</small><h3>{level.title}</h3><div>{guide.labels.map((label,i)=><span key={`${label}-${i}`}><b>{i+1}</b>{label}</span>)}</div><p>Identifica → relaciona → confirma</p></div>;
 }
 
-function Challenge({quiz,question,answer,score,finished,choose,retry,next,reset,continueCourse}:{quiz:Check[];question:number;answer:number|null;score:number;finished:boolean;choose:(i:number)=>void;retry:()=>void;next:()=>void;reset:()=>void;continueCourse:()=>void}){
+function Challenge({quiz,question,answer,score,finished,choose,retry,next,reset,continueCourse}:{quiz:QuizCheck[];question:number;answer:number|null;score:number;finished:boolean;choose:(i:number)=>void;retry:()=>void;next:()=>void;reset:()=>void;continueCourse:()=>void}){
   const passed=score>=8;const earnedXp=xpForScore(score);if(finished)return <div className="page result-page"><div className="result-card"><div className="trophy"><Trophy/></div><span className="eyebrow">Avaliação concluída</span><h1>{passed?"Nível dominado!":"Revê e tenta novamente"}</h1><p>Acertaste {score} de 10 à primeira tentativa. {passed?"O nível seguinte foi desbloqueado.":"São necessárias 8 respostas certas à primeira tentativa."}</p><div className="reward-row"><div><Zap/><strong>+{earnedXp}</strong><span>XP · {score===10?"perfeito":score===9?"excelente":score===8?"aprovado":"não aprovado"}</span></div><div><Star/><strong>{score}/10</strong><span>primeiras tentativas</span></div></div><div className="result-actions">{passed&&<button className="primary-button" onClick={continueCourse}>Continuar percurso <ChevronRight/></button>}<button className={passed?"ghost-button":"primary-button"} onClick={reset}>Novo desafio</button></div></div></div>;
   const item=quiz[question];const correct=answer===item.answer;return <div className="page challenge-page"><div className="challenge-head"><span className="eyebrow">Pergunta {question+1} de 10</span><h1>{item.q}</h1><p>A primeira resposta conta para a nota. Depois de um erro podes rever e tentar novamente.</p></div>{item.visual&&<QuestionVisual kind={item.visual}/>}<div className="option-list">{item.options.map((text,i)=><button key={`${text}-${i}`} onClick={()=>choose(i)} className={`option ${answer!==null&&i===item.answer?"correct":""} ${answer===i&&i!==item.answer?"wrong":""}`}><span>{String.fromCharCode(65+i)}</span><strong>{text}</strong>{answer!==null&&i===item.answer&&<Check/>}{answer===i&&i!==item.answer&&<X/>}</button>)}</div>{answer!==null&&<div className={`feedback ${correct?"positive":"negative"}`}><div><strong>{correct?"Correto.":"Ainda não. Revê a explicação."}</strong><span>{correct?(item.explanation||"A resposta corresponde ao princípio apresentado na aula."):`Resposta correta: ${item.options[item.answer]}. ${item.explanation||"Volta ao princípio técnico da aula e compara cada opção."} As opções serão baralhadas, mas este erro continua registado na nota.`}</span></div><button className="primary-button" onClick={correct?next:retry}>{correct?(question<9?"Próxima":"Ver resultado"):"Tentar novamente"}<ChevronRight/></button></div>}</div>
 }
 
-function QuestionVisual({kind}:{kind:NonNullable<Check["visual"]>}){
+function QuestionVisual({kind}:{kind:NonNullable<QuizCheck["visual"]>}){
   if(kind==="ac-dc-devices")return <div className="question-visual devices" role="img" aria-label="Rede doméstica com corrente alternada e bateria e USB com corrente contínua"><span>🏠<b>Rede · CA ~</b></span><span>🔋<b>Bateria · CC ⎓</b></span><span>🔌<b>USB · CC ⎓</b></span></div>;
   if(kind==="ac-wave"||kind==="dc-line")return <div className="question-visual wave-question" role="img" aria-label={kind==="ac-wave"?"Forma de onda que alterna acima e abaixo de zero":"Linha contínua acima de zero"}><b>{kind==="ac-wave"?"forma A":"forma B"}</b><svg viewBox="0 0 420 90" aria-hidden="true"><path className="axis" d="M10 45 H410"/><path d={kind==="ac-wave"?"M10 45 C45 0 80 0 115 45 S185 90 220 45 S290 0 325 45 S375 90 410 45":"M10 25 H410"}/></svg><small>{kind==="ac-wave"?"o valor atravessa o zero":"o valor mantém o mesmo sentido"}</small></div>;
   if(kind==="series-parallel")return <div className="question-visual mini-compare" role="img" aria-label="Circuito A com um percurso e circuito B com dois ramos"><MiniCircuit kind="series"/><MiniCircuit kind="parallel"/></div>;
