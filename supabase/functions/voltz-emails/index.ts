@@ -4,8 +4,8 @@ const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
 const CRON_SECRET = Deno.env.get("EMAIL_CRON_SECRET") ?? "";
 const SITE_URL = "https://jouunyyy.github.io/voltz-aprender-eletricidade/";
 const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/voltz-emails`;
-const HAPPY_FAISCA = `${SITE_URL}faisca-mobile.webp`;
-const SAD_FAISCA = `${SITE_URL}faisca-saudades.jpg`;
+const HAPPY_FAISCA = `${SITE_URL}faisca-email-happy-v2.jpg`;
+const SAD_FAISCA = `${SITE_URL}faisca-email-saudades-v2.jpg`;
 
 type Preferences = {
   user_id: string;
@@ -20,7 +20,13 @@ type Preferences = {
   test_sent_at: string | null;
 };
 
-const jsonHeaders = { "Content-Type": "application/json; charset=utf-8" };
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "https://jouunyyy.github.io",
+  "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info, x-cron-secret",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Vary": "Origin",
+};
+const jsonHeaders = { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" };
 
 function escapeHtml(value: string) {
   return value.replace(/[&<>'"]/g, (character) => ({
@@ -232,6 +238,9 @@ async function runBatch() {
 Deno.serve(async (request) => {
   const url = new URL(request.url);
   try {
+    if (request.method === "OPTIONS") {
+      return new Response("ok", { headers: corsHeaders });
+    }
     if (request.method === "GET" && url.pathname.endsWith("/health")) {
       return new Response(JSON.stringify({ ready: Boolean(RESEND_API_KEY && CRON_SECRET), resendConfigured: Boolean(RESEND_API_KEY), cronConfigured: Boolean(CRON_SECRET) }), { headers: jsonHeaders });
     }
@@ -242,7 +251,7 @@ Deno.serve(async (request) => {
         method: "PATCH",
         body: JSON.stringify({ consent: false, updated_at: new Date().toISOString() }),
       });
-      return new Response("<!doctype html><meta charset=utf-8><meta name=viewport content='width=device-width'><title>Emails cancelados</title><body style='font-family:Arial;background:#f3f7fc;color:#10213d;text-align:center;padding:50px 20px'><h1>⚡ Emails cancelados</h1><p>Não receberás mais lembretes de aprendizagem do Voltz.</p><a href='https://jouunyyy.github.io/voltz-aprender-eletricidade/'>Voltar ao Voltz</a></body>", { headers: { "Content-Type": "text/html; charset=utf-8" } });
+      return new Response("<!doctype html><meta charset=utf-8><meta name=viewport content='width=device-width'><title>Emails cancelados</title><body style='font-family:Arial;background:#f3f7fc;color:#10213d;text-align:center;padding:50px 20px'><h1>⚡ Emails cancelados</h1><p>Não receberás mais lembretes de aprendizagem do Voltz.</p><a href='https://jouunyyy.github.io/voltz-aprender-eletricidade/'>Voltar ao Voltz</a></body>", { headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" } });
     }
 
     if (request.method !== "POST") return new Response(JSON.stringify({ error: "Método não permitido" }), { status: 405, headers: jsonHeaders });
