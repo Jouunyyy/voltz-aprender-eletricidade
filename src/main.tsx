@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import AuthApp from "./supabase-auth";
-import { startTelemetry } from "./telemetry";
+import { reportTelemetry, startTelemetry } from "./telemetry";
 import "./globals.css";
 
 const SUPABASE_URL="https://utgtvdmafmehjgebyhqk.supabase.co";
@@ -11,7 +11,7 @@ const SESSION_KEY="voltz-auth-session";
 class AppErrorBoundary extends React.Component<{children:React.ReactNode},{error:Error|null}>{
   state:{error:Error|null}={error:null};
   static getDerivedStateFromError(error:Error){return {error}}
-  componentDidCatch(error:Error,info:React.ErrorInfo){console.error("Voltz runtime error",error,info)}
+  componentDidCatch(error:Error,info:React.ErrorInfo){console.error("Voltz runtime error",error,info);reportTelemetry("frontend",error.message,location.pathname+location.search,`${error.stack||""}\n${info.componentStack||""}`)}
   render(){
     if(this.state.error){
       return <main className="auth-page"><section className="auth-panel"><span className="eyebrow">Voltz</span><h2>Não foi possível abrir esta área.</h2><p>Ocorreu um erro inesperado. A tua sessão e o teu progresso não foram apagados.</p><button className="primary-button auth-submit" onClick={()=>{history.replaceState({},"",location.pathname);location.reload()}}>Voltar ao Voltz</button></section></main>;
