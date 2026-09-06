@@ -1,8 +1,7 @@
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const ORIGIN = 'https://jouunyyy.github.io';
-const headers={'Content-Type':'application/json','Access-Control-Allow-Origin':ORIGIN,'Access-Control-Allow-Headers':'authorization,apikey,content-type','Access-Control-Allow-Methods':'POST,OPTIONS','Vary':'Origin'};
-const reply=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status,headers});
+const ALLOWED_ORIGINS=new Set(['https://jouunyyy.github.io','https://voltz.midiahost.pt']);
+const baseHeaders={'Content-Type':'application/json','Access-Control-Allow-Headers':'authorization,apikey,content-type','Access-Control-Allow-Methods':'POST,OPTIONS','Vary':'Origin'};
 
 const serviceHeaders=()=>{
  const out:Record<string,string>={apikey:SERVICE_KEY,'Content-Type':'application/json'};
@@ -42,6 +41,9 @@ async function githubStatus(){
 }
 
 Deno.serve(async request=>{
+ const origin=request.headers.get('Origin')||'';
+ const headers={...baseHeaders,'Access-Control-Allow-Origin':ALLOWED_ORIGINS.has(origin)?origin:'https://voltz.midiahost.pt'};
+ const reply=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status,headers});
  if(request.method==='OPTIONS')return new Response('ok',{headers});
  if(request.method!=='POST')return reply({error:'Método não permitido.'},405);
  try{
@@ -73,7 +75,7 @@ Deno.serve(async request=>{
    if(system?.error)return reply(system,403);
    let email={status:'unknown'} as Record<string,unknown>;
    try{const res=await fetch(`${SUPABASE_URL}/functions/v1/voltz-emails/health`,{headers:{apikey:SERVICE_KEY}});const data=await res.json().catch(()=>null);email={status:res.ok?'operational':'degraded',health:data}}catch{email={status:'unavailable'}}
-   return reply({...system,version:'3.1',frontend:'operational',auth:'operational',edgeFunction:'operational',emails:email,github:await githubStatus(),checkedAt:new Date().toISOString()});
+   return reply({...system,version:'3.2',frontend:'operational',auth:'operational',edgeFunction:'operational',emails:email,github:await githubStatus(),checkedAt:new Date().toISOString()});
   }
 
   let data:unknown;
@@ -86,6 +88,12 @@ Deno.serve(async request=>{
    const allowed=new Set(['summary','set_teacher','save_school','assign_teacher_school','feedback','reports','errors','set_item_status','emails','audit']);
    if(!allowed.has(action))return reply({error:'Ação administrativa inválida.'},400);
    data=await rpc('voltz_admin_command',{p_user:user.id,p_action:action,p_input:input});
+  }
+
+  if(Array.isArray(data)){
+   if(action==='feedback')data=data.filter((x:any)=>x?.status==='new'||x?.status==='review');
+   else if(action==='reports')data=data.filter((x:any)=>x?.status==='new'||x?.status==='review');
+   else if(action==='errors')data=data.filter((x:any)=>x?.status==='open'||x?.status==='review');
   }
   return reply(data,(data as any)?.error?400:200);
  }catch(error){
