@@ -25,7 +25,7 @@ type Props={
 
 type Targets={sidebar:Element|null;mobile:Element|null;profileHero:Element|null;profilePage:Element|null};
 const emptyTargets:Targets={sidebar:null,mobile:null,profileHero:null,profilePage:null};
-const navClassByLabel:Record<string,string>={'Percurso':'is-nav-percurso','Manual':'is-nav-manual','Aula visual':'is-nav-hidden','Desafio':'is-nav-hidden','Voltz Live':'is-nav-live','Perfil':'is-nav-profile'};
+const navClassByLabel:Record<string,string>={'Percurso':'is-nav-percurso','Manual':'is-nav-manual','Aula':'is-nav-hidden','Aula visual':'is-nav-hidden','Desafio':'is-nav-hidden','Voltz Live':'is-nav-live','Perfil':'is-nav-profile'};
 
 export default function VoltzRoot(props:Props){
  const [adminOpen,setAdminOpen]=useState(false);
