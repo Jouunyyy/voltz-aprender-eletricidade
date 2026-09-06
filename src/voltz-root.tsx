@@ -73,15 +73,16 @@ export default function VoltzRoot(props:Props){
   const label=button?.querySelector('span')?.textContent?.trim();
   if(label==='Percurso'||label==='Manual'||label==='Voltz Live'||label==='Perfil')closeRoleArea();
  };
+ const roleOpen=adminOpen||teacherOpen;
 
  return <>
-  <div className="voltz-app-host" onClickCapture={handleBaseNavigation}>
+  <div className={`voltz-app-host ${roleOpen?'has-role-area':''}`} onClickCapture={handleBaseNavigation}>
    <FullVoltzApp user={props.user} loadRemote={props.loadRemote} saveRemote={props.saveRemote} emailConsent={props.emailConsent} emailPreferencesReady={props.emailPreferencesReady} onEmailConsent={props.onEmailConsent} onSendEmailTests={props.onSendEmailTests} onSignOut={props.onSignOut}/>
   </div>
   {targets.sidebar&&createPortal(navExtras,targets.sidebar)}
   {targets.mobile&&createPortal(navExtras,targets.mobile)}
-  {!adminOpen&&!teacherOpen&&canTeacher&&targets.profileHero&&createPortal(roleBadge,targets.profileHero)}
-  {!adminOpen&&!teacherOpen&&targets.profilePage&&createPortal(<StudentClassPanel request={teacherRequest} onReview={levelId=>{reviewLevel(levelId)}}/>,targets.profilePage)}
+  {!roleOpen&&canTeacher&&targets.profileHero&&createPortal(roleBadge,targets.profileHero)}
+  {!roleOpen&&targets.profilePage&&createPortal(<StudentClassPanel request={teacherRequest} onReview={levelId=>{reviewLevel(levelId)}}/>,targets.profilePage)}
   {teacherOpen&&canTeacher&&<div className="role-area"><VoltzTeachers request={teacherRequest} onExit={closeRoleArea} onOpenLive={openLive}/></div>}
   {adminOpen&&canAdmin&&<div className="role-area"><VoltzAdmin request={props.adminRequest} onExit={closeRoleArea}/></div>}
  </>;
