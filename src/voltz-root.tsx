@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { GraduationCap, Shield } from 'lucide-react';
+import { CirclePlay, GraduationCap, Shield } from 'lucide-react';
 import FullVoltzApp from './full-voltz-app';
 import VoltzAdmin from './voltz-admin';
 import VoltzTeachers, { StudentClassPanel } from './voltz-teachers';
+import VoltzVideoaulas from './voltz-videoaulas';
+import { categories } from './curriculum';
 import { teacherRequest } from './teacher-api';
 import './voltz-role.css';
 
@@ -25,11 +27,12 @@ type Props={
 
 type Targets={sidebar:Element|null;mobile:Element|null;profileHero:Element|null;profilePage:Element|null};
 const emptyTargets:Targets={sidebar:null,mobile:null,profileHero:null,profilePage:null};
-const navClassByLabel:Record<string,string>={'Percurso':'is-nav-percurso','Manual':'is-nav-manual','Aula':'is-nav-hidden','Aula visual':'is-nav-hidden','Desafio':'is-nav-hidden','Voltz Live':'is-nav-live','Perfil':'is-nav-profile'};
+const navClassByLabel:Record<string,string>={'Percurso':'is-nav-percurso','Manual':'is-nav-manual','Aula':'is-nav-hidden','Aula visual':'is-nav-hidden','Videoaulas':'is-nav-video','Desafio':'is-nav-hidden','Voltz Live':'is-nav-live','Perfil':'is-nav-profile'};
 
 export default function VoltzRoot(props:Props){
  const [adminOpen,setAdminOpen]=useState(false);
  const [teacherOpen,setTeacherOpen]=useState(false);
+ const [videoOpen,setVideoOpen]=useState(false);
  const [targets,setTargets]=useState<Targets>(emptyTargets);
  const canAdmin=props.role==='admin';
  const canTeacher=props.role==='teacher'||props.role==='admin';
@@ -42,7 +45,7 @@ export default function VoltzRoot(props:Props){
    const profileHero=document.querySelector('.profile-hero');
    const profilePage=document.querySelector('.profile-page');
    const versionBadge=document.querySelector<HTMLElement>('.version-badge');
-   if(versionBadge)versionBadge.textContent='v3.2 · Voltz atualizado';
+   if(versionBadge)versionBadge.textContent='v3.3 · Videoaulas';
    document.querySelectorAll<HTMLButtonElement>('.sidebar nav>.nav-item,.mobile-nav>.nav-item').forEach(item=>{
     const label=item.querySelector('span')?.textContent?.trim()||'';
     Object.values(navClassByLabel).forEach(className=>item.classList.remove(className));
@@ -58,22 +61,44 @@ export default function VoltzRoot(props:Props){
   return()=>{observer.disconnect();if(queued)cancelAnimationFrame(queued)};
  },[canTeacher,canAdmin]);
 
- const openTeachers=()=>{setAdminOpen(false);setTeacherOpen(true)};
- const openAdmin=()=>{setTeacherOpen(false);setAdminOpen(true)};
- const closeRoleArea=()=>{setAdminOpen(false);setTeacherOpen(false)};
+ const closeRoleArea=()=>{setAdminOpen(false);setTeacherOpen(false);setVideoOpen(false)};
+ const openTeachers=()=>{setAdminOpen(false);setVideoOpen(false);setTeacherOpen(true)};
+ const openAdmin=()=>{setTeacherOpen(false);setVideoOpen(false);setAdminOpen(true)};
+ const openVideos=()=>{setTeacherOpen(false);setAdminOpen(false);setVideoOpen(true)};
  const teacherButton=<button className={`nav-item teacher-launcher ${teacherOpen?'active':''}`} onClick={openTeachers} aria-label="Abrir Voltz Professores"><GraduationCap/><span>Professores</span></button>;
  const adminButton=<button className={`nav-item admin-launcher ${adminOpen?'active':''}`} onClick={openAdmin} aria-label="Abrir Voltz Admin"><Shield/><span>Admin</span></button>;
- const navExtras=<>{canTeacher&&teacherButton}{canAdmin&&adminButton}</>;
+ const videoButton=<button className={`nav-item video-launcher ${videoOpen?'active':''}`} onClick={openVideos} aria-label="Abrir Videoaulas"><CirclePlay/><span>Videoaulas</span></button>;
+ const navExtras=<>{videoButton}{canTeacher&&teacherButton}{canAdmin&&adminButton}</>;
  const roleBadge=<div className={`role-profile-entry ${canAdmin?'is-admin':'is-teacher'}`}>{canAdmin?<Shield/>:<GraduationCap/>}<div><strong>{canAdmin?'Administrador Voltz':'Professor Voltz'}</strong><span>{canAdmin?'Acesso à gestão operacional e ao Voltz Professores.':'A tua conta tem acesso ao Voltz Professores.'}</span></div>{canTeacher&&<button className="primary-button" onClick={openTeachers}>Abrir Voltz Professores</button>}{canAdmin&&<button className="primary-button admin-profile-button" onClick={openAdmin}>Admin</button>}</div>;
- const reviewLevel=(levelId:string)=>{closeRoleArea();requestAnimationFrame(()=>window.dispatchEvent(new CustomEvent('voltz-open-level',{detail:levelId})))};
- const openLive=()=>{closeRoleArea();requestAnimationFrame(()=>window.dispatchEvent(new CustomEvent('voltz-open-view',{detail:'live'})))};
+ const openBaseView=(label:string)=>{const button=Array.from(document.querySelectorAll<HTMLButtonElement>('.sidebar .nav-item')).find(item=>item.querySelector('span')?.textContent?.trim()===label);button?.click()};
+ const openCourseTarget=(levelId:string,challenge=false)=>{
+  const categoryIndex=categories.findIndex(category=>category.levels.some(level=>level.id===levelId));
+  const levelIndex=categoryIndex>=0?categories[categoryIndex].levels.findIndex(level=>level.id===levelId):-1;
+  closeRoleArea();
+  requestAnimationFrame(()=>{
+   openBaseView('Percurso');
+   requestAnimationFrame(()=>{
+    const tabs=document.querySelectorAll<HTMLButtonElement>('.category-tabs button');
+    tabs[categoryIndex]?.click();
+    requestAnimationFrame(()=>{
+     const cards=document.querySelectorAll<HTMLButtonElement>('.level-grid .level-card');
+     const card=cards[levelIndex];
+     if(!card||card.disabled){card?.focus();return}
+     card.click();
+     if(challenge)requestAnimationFrame(()=>openBaseView('Desafio'));
+    });
+   });
+  });
+ };
+ const reviewLevel=(levelId:string)=>openCourseTarget(levelId,false);
+ const openLive=()=>{closeRoleArea();requestAnimationFrame(()=>openBaseView('Voltz Live'))};
  const handleBaseNavigation=(event:React.MouseEvent<HTMLDivElement>)=>{
-  if(!adminOpen&&!teacherOpen)return;
+  if(!adminOpen&&!teacherOpen&&!videoOpen)return;
   const button=(event.target as Element).closest<HTMLButtonElement>('.sidebar .nav-item,.mobile-nav .nav-item');
   const label=button?.querySelector('span')?.textContent?.trim();
   if(label==='Percurso'||label==='Manual'||label==='Voltz Live'||label==='Perfil')closeRoleArea();
  };
- const roleOpen=adminOpen||teacherOpen;
+ const roleOpen=adminOpen||teacherOpen||videoOpen;
 
  return <>
   <div className={`voltz-app-host ${roleOpen?'has-role-area':''}`} onClickCapture={handleBaseNavigation}>
@@ -82,7 +107,8 @@ export default function VoltzRoot(props:Props){
   {targets.sidebar&&createPortal(navExtras,targets.sidebar)}
   {targets.mobile&&createPortal(navExtras,targets.mobile)}
   {!roleOpen&&canTeacher&&targets.profileHero&&createPortal(roleBadge,targets.profileHero)}
-  {!roleOpen&&targets.profilePage&&createPortal(<StudentClassPanel request={teacherRequest} onReview={levelId=>{reviewLevel(levelId)}}/>,targets.profilePage)}
+  {!roleOpen&&targets.profilePage&&createPortal(<StudentClassPanel request={teacherRequest} onReview={reviewLevel}/>,targets.profilePage)}
+  {videoOpen&&<div className="role-area video-role-area"><VoltzVideoaulas user={props.user} onExit={closeRoleArea} onOpenLevel={levelId=>openCourseTarget(levelId,false)} onChallenge={levelId=>openCourseTarget(levelId,true)}/></div>}
   {teacherOpen&&canTeacher&&<div className="role-area"><VoltzTeachers request={teacherRequest} onExit={closeRoleArea} onOpenLive={openLive}/></div>}
   {adminOpen&&canAdmin&&<div className="role-area"><VoltzAdmin request={props.adminRequest} onExit={closeRoleArea}/></div>}
  </>;
