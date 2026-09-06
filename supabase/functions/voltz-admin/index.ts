@@ -6,8 +6,6 @@ const reply=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status
 
 const serviceHeaders=()=>{
  const out:Record<string,string>={apikey:SERVICE_KEY,'Content-Type':'application/json'};
- // Legacy service_role keys are JWTs and must also be sent as Bearer tokens.
- // New sb_secret_* keys authenticate via apikey and must not be used as Bearer JWTs.
  if(SERVICE_KEY.startsWith('eyJ'))out.Authorization=`Bearer ${SERVICE_KEY}`;
  return out;
 };
@@ -49,8 +47,6 @@ Deno.serve(async request=>{
  try{
   const bearer=request.headers.get('Authorization');
   if(!bearer?.startsWith('Bearer '))return reply({error:'Inicia sessão para continuar.'},401);
-
-  // The backend key goes in apikey; the signed-in user's JWT stays in Authorization.
   const auth=await fetch(`${SUPABASE_URL}/auth/v1/user`,{headers:{apikey:SERVICE_KEY,Authorization:bearer}});
   if(!auth.ok)return reply({error:'A sessão expirou. Volta a entrar no Voltz.'},401);
   const user=await auth.json();
@@ -96,6 +92,6 @@ Deno.serve(async request=>{
   const diagnostic=error instanceof Error?error.message:'unknown';
   console.error('Voltz Admin request failed',diagnostic);
   const safeCode=diagnostic.startsWith('rpc:')?diagnostic.split(':').slice(0,4).join(':'):diagnostic.startsWith('roles:')?diagnostic:'ADMIN_BACKEND_ERROR';
-  return reply({error:'Não foi possível processar o pedido.',code:safeCode},500);
+  return reply({error:`Não foi possível processar o pedido. Código: ${safeCode}`},500);
  }
 });
