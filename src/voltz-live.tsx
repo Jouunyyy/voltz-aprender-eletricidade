@@ -100,10 +100,12 @@ export default function VoltzLive({user,onExit,renderVisual}:{user:{id:string;na
 
  async function openRoom(room:LiveRoom){
   if(locked.current)return;
+  let refreshRooms=false;
   locked.current=true;setBusy(true);setError('');
   try{const next=await liveRequest<LiveState>('state',{id:room.id});receive(next)}
-  catch(e){if(alive.current){setError(e instanceof Error?e.message:'Não foi possível reabrir a sala.');await loadRooms()}}
+  catch(e){if(alive.current){setError(e instanceof Error?e.message:'Não foi possível reabrir a sala.');refreshRooms=true}}
   finally{locked.current=false;if(alive.current)setBusy(false)}
+  if(refreshRooms&&alive.current)await loadRooms();
  }
 
  async function endRoom(room:LiveRoom){
