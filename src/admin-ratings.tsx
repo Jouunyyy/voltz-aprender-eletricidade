@@ -4,12 +4,10 @@ import { Star } from 'lucide-react';
 import './admin-ratings.css';
 
 type RequestFn=(action:string,input?:Record<string,unknown>)=>Promise<any>;
-type Mode='real'|'test'|'all';
 
 export default function AdminRatings({request,visible}:{request:RequestFn;visible:boolean}){
   const [active,setActive]=useState(false);
   const [target,setTarget]=useState<Element|null>(null);
-  const [mode,setMode]=useState<Mode>('real');
   const [days,setDays]=useState(30);
   const [data,setData]=useState<any>(null);
   const [error,setError]=useState('');
@@ -36,9 +34,9 @@ export default function AdminRatings({request,visible}:{request:RequestFn;visibl
     if(!active)return;
     let cancelled=false;
     setBusy(true);setError('');
-    request('ratings',{mode,days}).then(next=>{if(!cancelled)setData(next)}).catch(err=>{if(!cancelled)setError(err instanceof Error?err.message:'Não foi possível carregar as avaliações.')}).finally(()=>{if(!cancelled)setBusy(false)});
+    request('ratings',{mode:'real',days}).then(next=>{if(!cancelled)setData(next)}).catch(err=>{if(!cancelled)setError(err instanceof Error?err.message:'Não foi possível carregar as avaliações.')}).finally(()=>{if(!cancelled)setBusy(false)});
     return()=>{cancelled=true};
-  },[active,mode,days,request]);
+  },[active,days,request]);
 
   const distribution=useMemo(()=>{
     const total=Number(data?.total||0);
@@ -50,7 +48,7 @@ export default function AdminRatings({request,visible}:{request:RequestFn;visibl
 
   if(!visible||!active||!target)return null;
   return createPortal(<section className="admin-card admin-ratings-card">
-    <div className="admin-ratings-head"><div><h2>Avaliação do Voltz</h2><p>Resumo agregado, sem nomes nem emails.</p></div><div className="admin-ratings-modes" aria-label="Tipo de avaliações"><button className={mode==='real'?'active':''} onClick={()=>setMode('real')}>Reais</button><button className={mode==='test'?'active':''} onClick={()=>setMode('test')}>Teste</button><button className={mode==='all'?'active':''} onClick={()=>setMode('all')}>Todos</button></div></div>
+    <div className="admin-ratings-head"><div><h2>Avaliação do Voltz</h2><p>Resumo agregado, sem nomes nem emails.</p></div></div>
     <div className="admin-range" aria-label="Período das avaliações"><span>Período:</span>{[7,30,90].map(value=><button key={value} className={days===value?'active':''} onClick={()=>setDays(value)}>{value} dias</button>)}</div>
     {error&&<div className="admin-error" role="alert">{error}</div>}
     {busy&&!data?<p>A carregar avaliações…</p>:<>
