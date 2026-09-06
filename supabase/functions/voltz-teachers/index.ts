@@ -14,6 +14,7 @@ async function callRpc(name:string,body:Record<string,unknown>){
 async function rpc(userId:string,action:string,input:Record<string,unknown>={}){
  if(action==='student_context')return callRpc('voltz_teacher_student_context',{p_user:userId});
  if(action==='dismiss_recommendation')return callRpc('voltz_teacher_dismiss_recommendation',{p_user:userId,p_id:input.id});
+ if(action==='recommend')return callRpc('voltz_teacher_recommend',{p_user:userId,p_class:input.classId,p_student:input.studentId||null,p_level:input.levelId,p_message:input.message||null});
  if(action==='link_live'){
   if(input.classCode)return callRpc('voltz_teacher_link_live_code',{p_user:userId,p_class_code:input.classCode,p_code:input.code});
   return callRpc('voltz_teacher_link_live',{p_user:userId,p_class:input.classId,p_code:input.code});
