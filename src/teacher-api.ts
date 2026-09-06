@@ -1,6 +1,9 @@
 import { getValidAccessToken, SUPABASE_KEY, SUPABASE_URL } from './supabase-client';
 
-export async function teacherRequest(action:string,input:Record<string,unknown>={}){
+const readActions=new Set(['student_context','teacher_home','class_detail','student_detail']);
+const inFlight=new Map<string,Promise<any>>();
+
+async function requestTeacher(action:string,input:Record<string,unknown>={}){
  const token=await getValidAccessToken();
  const controller=new AbortController();
  const timeout=window.setTimeout(()=>controller.abort(),15000);
@@ -10,6 +13,15 @@ export async function teacherRequest(action:string,input:Record<string,unknown>=
   if(!response.ok||data.error){const code=data.code?` Código: ${data.code}`:'';throw new Error(`${data.error||'Não foi possível processar o pedido.'}${code}`)}
   return data;
  }catch(error){if(error instanceof DOMException&&error.name==='AbortError')throw new Error('A ligação ao Voltz Professores demorou demasiado. Tenta novamente.');throw error}finally{window.clearTimeout(timeout)}
+}
+
+export function teacherRequest(action:string,input:Record<string,unknown>={}){
+ if(!readActions.has(action))return requestTeacher(action,input);
+ const key=`${action}:${JSON.stringify(input)}`;
+ const pending=inFlight.get(key);if(pending)return pending;
+ const next=requestTeacher(action,input).finally(()=>inFlight.delete(key));
+ inFlight.set(key,next);
+ return next;
 }
 
 export function recordStudentAnswer(input:Record<string,unknown>){void teacherRequest('record_answer',input).catch(()=>{})}
