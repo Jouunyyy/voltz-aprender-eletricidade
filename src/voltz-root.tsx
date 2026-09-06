@@ -25,6 +25,7 @@ type Props={
 
 type Targets={sidebar:Element|null;mobile:Element|null;profileHero:Element|null;profilePage:Element|null};
 const emptyTargets:Targets={sidebar:null,mobile:null,profileHero:null,profilePage:null};
+const navClassByLabel:Record<string,string>={'Percurso':'is-nav-percurso','Manual':'is-nav-manual','Aula visual':'is-nav-hidden','Desafio':'is-nav-hidden','Voltz Live':'is-nav-live','Perfil':'is-nav-profile'};
 
 export default function VoltzRoot(props:Props){
  const [adminOpen,setAdminOpen]=useState(false);
@@ -41,6 +42,11 @@ export default function VoltzRoot(props:Props){
    const mobile=document.querySelector('.mobile-nav');
    const profileHero=document.querySelector('.profile-hero');
    const profilePage=document.querySelector('.profile-page');
+   document.querySelectorAll<HTMLButtonElement>('.sidebar nav>.nav-item,.mobile-nav>.nav-item').forEach(item=>{
+    const label=item.querySelector('span')?.textContent?.trim()||'';
+    Object.values(navClassByLabel).forEach(className=>item.classList.remove(className));
+    const className=navClassByLabel[label];if(className)item.classList.add(className);
+   });
    if(mobile){mobile.classList.toggle('has-teacher-nav',canTeacher);mobile.classList.toggle('has-admin-nav',canAdmin)}
    setTargets(prev=>prev.sidebar===sidebar&&prev.mobile===mobile&&prev.profileHero===profileHero&&prev.profilePage===profilePage?prev:{sidebar,mobile,profileHero,profilePage});
   };
