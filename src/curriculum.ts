@@ -1,5 +1,5 @@
 export type Check = { q: string; options: [string, string, string]; answer: number; explanation?: string; visual?: "ac-wave"|"dc-line"|"ac-dc-devices"|"closed-circuit"|"open-circuit"|"series-open"|"parallel-open"|"series-parallel" };
-export type CourseLevel = { id: string; title: string; objective: string; theory: string; practice: string; formula?: string };
+export type CourseLevel = { id: string; title: string; objective: string; theory: string; practice: string; formula?: string; category?: { name: string } };
 export type Category = { id: string; name: string; role: string; color: string; levels: CourseLevel[]; checks: Check[] };
 
 const makeLevels = (category: string, rows: Array<[string,string,string,string,string?]>): CourseLevel[] => rows.map((r,i)=>({id:`${category}-${i+1}`,title:r[0],objective:r[1],theory:r[2],practice:r[3],formula:r[4]}));
