@@ -12,7 +12,10 @@ async function callRpc(name:string,body:Record<string,unknown>){
  return data;
 }
 async function rpc(userId:string,action:string,input:Record<string,unknown>={}){
- if(action==='link_live')return callRpc('voltz_teacher_link_live',{p_user:userId,p_class:input.classId,p_code:input.code});
+ if(action==='link_live'){
+  if(input.classCode)return callRpc('voltz_teacher_link_live_code',{p_user:userId,p_class_code:input.classCode,p_code:input.code});
+  return callRpc('voltz_teacher_link_live',{p_user:userId,p_class:input.classId,p_code:input.code});
+ }
  return callRpc('voltz_teacher_command',{p_user:userId,p_action:action,p_input:input});
 }
 Deno.serve(async request=>{
