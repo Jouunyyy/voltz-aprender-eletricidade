@@ -1,93 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AlertTriangle, Flag, X } from 'lucide-react';
+import { getValidAccessToken, SUPABASE_KEY, SUPABASE_URL } from './supabase-client';
 import './question-report.css';
 
-const SUPABASE_URL='https://utgtvdmafmehjgebyhqk.supabase.co';
-const SUPABASE_KEY='sb_publishable_RJmuDpACfRDdDjS66HRCSQ_hTtxAfht';
-const SESSION_KEY='voltz-auth-session';
 const LEVEL_CONTEXT='voltz-learning-level-context';
-
 type Reason='incorrect_question'|'potentially_wrong_content'|'inappropriate_image'|'other';
-
 type Snapshot={question:string;questionNo:string;levelId:string;levelTitle:string;options:string[]};
-
-function readSessionToken(){
-  try{return JSON.parse(localStorage.getItem(SESSION_KEY)||'null')?.access_token as string|undefined}catch{return undefined}
-}
-function readLevel(){
-  try{return JSON.parse(sessionStorage.getItem(LEVEL_CONTEXT)||'null') as {id?:string;title?:string}|null}catch{return null}
-}
-function capture():Snapshot{
-  const level=readLevel();
-  const question=document.querySelector('.challenge-head h1')?.textContent?.trim()||'Pergunta sem texto';
-  const questionNo=(document.querySelector('.challenge-head .eyebrow')?.textContent||'').match(/\d+/)?.[0]||'';
-  const options=[...document.querySelectorAll('.challenge-page .option strong')].map(el=>el.textContent?.trim()||'').filter(Boolean);
-  return {question,questionNo,levelId:level?.id||'unknown',levelTitle:level?.title||'Nível não identificado',options};
-}
-async function submitReport(snapshot:Snapshot,reason:Reason,note:string){
-  const token=readSessionToken();
-  if(!token)throw new Error('Inicia sessão novamente para enviar o report.');
-  const targetId=`${snapshot.levelId}:${snapshot.question}`.slice(0,200);
-  const description=[
-    `Nível: ${snapshot.levelTitle} (${snapshot.levelId})`,
-    snapshot.questionNo?`Pergunta: ${snapshot.questionNo}`:null,
-    `Enunciado: ${snapshot.question}`,
-    snapshot.options.length?`Opções: ${snapshot.options.map((x,i)=>`${String.fromCharCode(65+i)}) ${x}`).join(' | ')}`:null,
-    note.trim()?`Nota do utilizador: ${note.trim()}`:null,
-  ].filter(Boolean).join('\n').slice(0,4000);
-  const response=await fetch(`${SUPABASE_URL}/functions/v1/voltz-admin`,{
-    method:'POST',
-    headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},
-    body:JSON.stringify({action:'submit_report',input:{targetType:'question',targetId,reason,description}}),
-  });
-  const data=await response.json().catch(()=>({}));
-  if(!response.ok||data.error)throw new Error(data.error||'Não foi possível enviar o report.');
-}
+function readLevel(){try{return JSON.parse(sessionStorage.getItem(LEVEL_CONTEXT)||'null') as {id?:string;title?:string}|null}catch{return null}}
+function capture():Snapshot{const level=readLevel();const question=document.querySelector('.challenge-head h1')?.textContent?.trim()||'Pergunta sem texto';const questionNo=(document.querySelector('.challenge-head .eyebrow')?.textContent||'').match(/\d+/)?.[0]||'';const options=[...document.querySelectorAll('.challenge-page .option strong')].map(el=>el.textContent?.trim()||'').filter(Boolean);return {question,questionNo,levelId:level?.id||'unknown',levelTitle:level?.title||'Nível não identificado',options}}
+async function submitReport(snapshot:Snapshot,reason:Reason,note:string){const token=await getValidAccessToken();const targetId=`${snapshot.levelId}:${snapshot.question}`.slice(0,200);const description=[`Nível: ${snapshot.levelTitle} (${snapshot.levelId})`,snapshot.questionNo?`Pergunta: ${snapshot.questionNo}`:null,`Enunciado: ${snapshot.question}`,snapshot.options.length?`Opções: ${snapshot.options.map((x,i)=>`${String.fromCharCode(65+i)}) ${x}`).join(' | ')}`:null,note.trim()?`Nota do utilizador: ${note.trim()}`:null].filter(Boolean).join('\n').slice(0,4000);const response=await fetch(`${SUPABASE_URL}/functions/v1/voltz-admin`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({action:'submit_report',input:{targetType:'question',targetId,reason,description}})});const data=await response.json().catch(()=>({}));if(!response.ok||data.error)throw new Error(data.error||'Não foi possível enviar o report.')}
 
 export default function QuestionReportBridge(){
-  const [host,setHost]=useState<Element|null>(null);
-  const [open,setOpen]=useState(false);
-  const [snapshot,setSnapshot]=useState<Snapshot|null>(null);
-  const [reason,setReason]=useState<Reason>('incorrect_question');
-  const [note,setNote]=useState('');
-  const [busy,setBusy]=useState(false);
-  const [message,setMessage]=useState('');
-  const [error,setError]=useState('');
-
-  useEffect(()=>{
-    let frame=0;
-    const scan=()=>{frame=0;const next=document.querySelector('.challenge-page');setHost(prev=>prev===next?prev:next)};
-    const schedule=()=>{if(!frame)frame=requestAnimationFrame(scan)};
-    scan();
-    const observer=new MutationObserver(schedule);
-    observer.observe(document.body,{childList:true,subtree:true});
-    return()=>{observer.disconnect();if(frame)cancelAnimationFrame(frame)};
-  },[]);
-
-  const button=useMemo(()=>host?createPortal(
-    <section className="question-report-entry" aria-label="Reportar problema nesta pergunta">
-      <span><Flag/> Encontraste um problema nesta pergunta?</span>
-      <button type="button" onClick={()=>{setSnapshot(capture());setReason('incorrect_question');setNote('');setMessage('');setError('');setOpen(true)}}>Reportar</button>
-    </section>,host):null,[host]);
-
-  async function send(){
-    if(!snapshot)return;
-    setBusy(true);setError('');setMessage('');
-    try{await submitReport(snapshot,reason,note);setMessage('Obrigado. O report foi enviado para revisão.')}
-    catch(err){setError(err instanceof Error?err.message:'Não foi possível enviar o report.')}
-    finally{setBusy(false)}
-  }
-
-  return <>{button}{open&&createPortal(<div className="question-report-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget&&!busy)setOpen(false)}}><section className="question-report-modal" role="dialog" aria-modal="true" aria-labelledby="question-report-title">
-    <button className="question-report-close" onClick={()=>setOpen(false)} aria-label="Fechar" disabled={busy}><X/></button>
-    <div className="question-report-icon"><AlertTriangle/></div>
-    <span className="eyebrow">Ajuda-nos a melhorar</span>
-    <h2 id="question-report-title">Reportar esta pergunta</h2>
-    <p className="question-report-question">{snapshot?.question}</p>
-    {!message&&<><label><span>Qual é o problema?</span><select value={reason} onChange={e=>setReason(e.target.value as Reason)} disabled={busy}><option value="incorrect_question">Pergunta incorreta</option><option value="potentially_wrong_content">Conteúdo potencialmente errado</option><option value="inappropriate_image">Imagem inadequada</option><option value="other">Outro</option></select></label><label><span>Explica brevemente <small>(opcional)</small></span><textarea value={note} onChange={e=>setNote(e.target.value)} maxLength={1200} rows={4} placeholder="O que encontraste nesta pergunta?" disabled={busy}/></label></>}
-    {error&&<p className="question-report-error" role="alert">{error}</p>}
-    {message&&<p className="question-report-success" role="status">{message}</p>}
-    <div className="question-report-actions">{message?<button className="primary-button" onClick={()=>setOpen(false)}>Fechar</button>:<><button className="ghost-button" onClick={()=>setOpen(false)} disabled={busy}>Cancelar</button><button className="primary-button" onClick={()=>void send()} disabled={busy}>{busy?'A enviar…':'Enviar report'}</button></>}</div>
-  </section></div>,document.body)}</>;
+ const [host,setHost]=useState<Element|null>(null);const [open,setOpen]=useState(false);const [snapshot,setSnapshot]=useState<Snapshot|null>(null);const [reason,setReason]=useState<Reason>('incorrect_question');const [note,setNote]=useState('');const [busy,setBusy]=useState(false);const [message,setMessage]=useState('');const [error,setError]=useState('');
+ useEffect(()=>{let frame=0;const scan=()=>{frame=0;const next=document.querySelector('.challenge-page');setHost(prev=>prev===next?prev:next)};const schedule=()=>{if(!frame)frame=requestAnimationFrame(scan)};scan();const observer=new MutationObserver(schedule);observer.observe(document.body,{childList:true,subtree:true});return()=>{observer.disconnect();if(frame)cancelAnimationFrame(frame)}},[]);
+ const button=useMemo(()=>host?createPortal(<section className="question-report-entry" aria-label="Reportar problema nesta pergunta"><span><Flag/> Encontraste um problema nesta pergunta?</span><button type="button" onClick={()=>{setSnapshot(capture());setReason('incorrect_question');setNote('');setMessage('');setError('');setOpen(true)}}>Reportar</button></section>,host):null,[host]);
+ async function send(){if(!snapshot)return;setBusy(true);setError('');setMessage('');try{await submitReport(snapshot,reason,note);setMessage('Obrigado. O report foi enviado para revisão.')}catch(err){setError(err instanceof Error?err.message:'Não foi possível enviar o report.')}finally{setBusy(false)}}
+ return <>{button}{open&&createPortal(<div className="question-report-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget&&!busy)setOpen(false)}}><section className="question-report-modal" role="dialog" aria-modal="true" aria-labelledby="question-report-title"><button className="question-report-close" onClick={()=>setOpen(false)} aria-label="Fechar" disabled={busy}><X/></button><div className="question-report-icon"><AlertTriangle/></div><span className="eyebrow">Ajuda-nos a melhorar</span><h2 id="question-report-title">Reportar esta pergunta</h2><p className="question-report-question">{snapshot?.question}</p>{!message&&<><label><span>Qual é o problema?</span><select value={reason} onChange={e=>setReason(e.target.value as Reason)} disabled={busy}><option value="incorrect_question">Pergunta incorreta</option><option value="potentially_wrong_content">Conteúdo potencialmente errado</option><option value="inappropriate_image">Imagem inadequada</option><option value="other">Outro</option></select></label><label><span>Explica brevemente <small>(opcional)</small></span><textarea value={note} onChange={e=>setNote(e.target.value)} maxLength={1200} rows={4} placeholder="O que encontraste nesta pergunta?" disabled={busy}/></label></>}{error&&<p className="question-report-error" role="alert">{error}</p>}{message&&<p className="question-report-success" role="status">{message}</p>}<div className="question-report-actions">{message?<button className="primary-button" onClick={()=>setOpen(false)}>Fechar</button>:<><button className="ghost-button" onClick={()=>setOpen(false)} disabled={busy}>Cancelar</button><button className="primary-button" onClick={()=>void send()} disabled={busy}>{busy?'A enviar…':'Enviar report'}</button></>}</div></section></div>,document.body)}</>;
 }
