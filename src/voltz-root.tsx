@@ -4,7 +4,6 @@ import { GraduationCap, Shield } from 'lucide-react';
 import FullVoltzApp from './full-voltz-app';
 import VoltzAdmin from './voltz-admin';
 import VoltzTeachers, { StudentClassPanel } from './voltz-teachers';
-import RecommendationDeleteBridge from './recommendation-delete-bridge';
 import { teacherRequest } from './teacher-api';
 import './voltz-role.css';
 
@@ -69,6 +68,5 @@ export default function VoltzRoot(props:Props){
   {!adminOpen&&!teacherOpen&&targets.mobile&&createPortal(navExtras,targets.mobile)}
   {!adminOpen&&!teacherOpen&&canTeacher&&targets.profileHero&&createPortal(roleBadge,targets.profileHero)}
   {!adminOpen&&!teacherOpen&&targets.profilePage&&createPortal(<StudentClassPanel request={teacherRequest} onReview={levelId=>{reviewLevel(levelId)}}/>,targets.profilePage)}
-  {!adminOpen&&!teacherOpen&&targets.profilePage&&<RecommendationDeleteBridge request={teacherRequest}/>} 
  </>;
 }
