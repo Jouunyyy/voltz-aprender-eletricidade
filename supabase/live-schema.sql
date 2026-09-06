@@ -100,6 +100,7 @@ begin
  if p_action in ('start','close','next','end') and s.host_user_id<>p_user then return jsonb_build_object('error','Só o anfitrião pode controlar a sessão.'); end if;
  select count(*) into total from voltz_live.questions where session_id=s.id;
  duration=(s.config->>'duration')::integer;
+ if p_action='close' and duration<>0 then return jsonb_build_object('error','Só podes fechar manualmente uma pergunta sem limite de tempo.'); end if;
  if p_action='start' and s.phase='lobby' then
   update voltz_live.sessions set phase='question',started_at=clock where id=s.id returning * into s;
  elsif p_action='next' then
