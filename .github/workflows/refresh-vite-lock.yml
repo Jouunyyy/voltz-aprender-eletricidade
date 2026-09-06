@@ -1,0 +1,32 @@
+name: Atualizar Vite com segurança
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/refresh-vite-lock.yml]
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install vite@8.0.16 --save-exact --package-lock-only --ignore-scripts
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npm run typecheck
+      - run: npm run build
+      - name: Commit lockfile seguro
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          if git diff --cached --quiet; then
+            echo "Sem alterações para gravar."
+            exit 0
+          fi
+          git commit -m "Upgrade Vite to 8.0.16"
+          git push
