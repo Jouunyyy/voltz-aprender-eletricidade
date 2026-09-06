@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import AuthApp from "./supabase-auth";
 import QuestionReportBridge from "./question-report";
+import { PublicCertificateValidation } from "./certificate-system";
 import { reportTelemetry, startTelemetry } from "./telemetry";
 import { installLearningTelemetry } from "./learning-telemetry";
 import { SUPABASE_KEY, SUPABASE_URL, writeStoredSession } from "./supabase-client";
@@ -15,5 +16,5 @@ class AppErrorBoundary extends React.Component<{children:React.ReactNode},{error
 }
 
 async function consumeOAuthCallback(){const hash=new URLSearchParams(location.hash.replace(/^#/,""));if(!hash.get("access_token")||hash.get("type")==="recovery")return;const accessToken=hash.get("access_token")!;const refreshToken=hash.get("refresh_token")||"";const expiresIn=Number(hash.get("expires_in")||3600);history.replaceState({},"",location.pathname+location.search);const response=await fetch(`${SUPABASE_URL}/auth/v1/user`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${accessToken}`}});if(!response.ok)throw new Error("Não foi possível concluir o início de sessão com Google.");const user=await response.json();writeStoredSession({access_token:accessToken,refresh_token:refreshToken,expires_at:Math.floor(Date.now()/1000)+expiresIn,user})}
-async function start(){try{await consumeOAuthCallback()}catch(error){console.error("OAuth callback failed",error)}startTelemetry();installLearningTelemetry();ReactDOM.createRoot(document.getElementById("root")!).render(<React.StrictMode><AppErrorBoundary><><AuthApp /><QuestionReportBridge/></></AppErrorBoundary></React.StrictMode>)}
+async function start(){try{await consumeOAuthCallback()}catch(error){console.error("OAuth callback failed",error)}startTelemetry();installLearningTelemetry();const publicCode=new URLSearchParams(location.search).get("certificado");ReactDOM.createRoot(document.getElementById("root")!).render(<React.StrictMode><AppErrorBoundary>{publicCode?<PublicCertificateValidation code={publicCode}/>:<><AuthApp/><QuestionReportBridge/></>}</AppErrorBoundary></React.StrictMode>)}
 void start();
