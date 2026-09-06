@@ -47,7 +47,7 @@ export default function VoltzRoot(props:Props){
   const schedule=()=>{if(!queued)queued=requestAnimationFrame(scan)};
   scan();
   const observer=new MutationObserver(schedule);
-  observer.observe(document.body,{childList:true,subtree:true});
+  observer.observe(document.getElementById('root')||document.body,{childList:true,subtree:true});
   return()=>{observer.disconnect();if(queued)cancelAnimationFrame(queued)};
  },[adminOpen,teacherOpen,canTeacher,canAdmin]);
 
