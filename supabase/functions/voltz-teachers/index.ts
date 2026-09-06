@@ -12,6 +12,8 @@ async function callRpc(name:string,body:Record<string,unknown>){
  return data;
 }
 async function rpc(userId:string,action:string,input:Record<string,unknown>={}){
+ if(action==='student_context')return callRpc('voltz_teacher_student_context',{p_user:userId});
+ if(action==='dismiss_recommendation')return callRpc('voltz_teacher_dismiss_recommendation',{p_user:userId,p_id:input.id});
  if(action==='link_live'){
   if(input.classCode)return callRpc('voltz_teacher_link_live_code',{p_user:userId,p_class_code:input.classCode,p_code:input.code});
   return callRpc('voltz_teacher_link_live',{p_user:userId,p_class:input.classId,p_code:input.code});
@@ -30,7 +32,7 @@ Deno.serve(async request=>{
   if(!user.id||user.is_anonymous)return reply({error:'É necessária uma conta Voltz.'},401);
   const raw=await request.text();if(raw.length>12000)return reply({error:'Pedido demasiado grande.'},413);
   const body=raw?JSON.parse(raw):{};const action=typeof body.action==='string'?body.action:'';const input=body.input&&typeof body.input==='object'?body.input:{};
-  const allowed=new Set(['student_context','join_class','leave_class','mark_recommendation','record_answer','record_level','teacher_home','create_class','archive_class','class_detail','student_detail','recommend','link_live']);
+  const allowed=new Set(['student_context','join_class','leave_class','mark_recommendation','dismiss_recommendation','record_answer','record_level','teacher_home','create_class','archive_class','class_detail','student_detail','recommend','link_live']);
   if(!allowed.has(action))return reply({error:'Ação inválida.'},400);
   const data=await rpc(user.id,action,input);
   if(data?.error){const status=data.error.includes('reservado')||data.error.includes('permissão')?403:400;return reply(data,status)}
