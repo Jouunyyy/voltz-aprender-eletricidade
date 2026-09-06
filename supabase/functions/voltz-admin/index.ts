@@ -75,7 +75,7 @@ Deno.serve(async request=>{
    if(system?.error)return reply(system,403);
    let email={status:'unknown'} as Record<string,unknown>;
    try{const res=await fetch(`${SUPABASE_URL}/functions/v1/voltz-emails/health`,{headers:{apikey:SERVICE_KEY}});const data=await res.json().catch(()=>null);email={status:res.ok?'operational':'degraded',health:data}}catch{email={status:'unavailable'}}
-   return reply({...system,version:'3.2',frontend:'operational',auth:'operational',edgeFunction:'operational',emails:email,github:await githubStatus(),checkedAt:new Date().toISOString()});
+   return reply({...system,version:'3.3',frontend:'operational',auth:'operational',edgeFunction:'operational',emails:email,github:await githubStatus(),checkedAt:new Date().toISOString()});
   }
 
   let data:unknown;
@@ -84,6 +84,7 @@ Deno.serve(async request=>{
   else if(action==='teachers')data=await rpc('voltz_admin_teachers',{p_user:user.id});
   else if(action==='schools')data=await rpc('voltz_admin_schools',{p_user:user.id});
   else if(action==='statistics')data=await rpc('voltz_admin_statistics',{p_user:user.id,p_days:Number(input.days||7)});
+  else if(action==='ratings')data=await rpc('voltz_admin_rating_summary',{p_user:user.id,p_mode:String(input.mode||'real'),p_days:Number(input.days||30)});
   else{
    const allowed=new Set(['summary','set_teacher','save_school','assign_teacher_school','feedback','reports','errors','set_item_status','emails','audit']);
    if(!allowed.has(action))return reply({error:'Ação administrativa inválida.'},400);
