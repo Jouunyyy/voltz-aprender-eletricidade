@@ -1,8 +1,7 @@
 const SUPABASE_URL=Deno.env.get('SUPABASE_URL')!;
 const SERVICE_KEY=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const ORIGIN='https://jouunyyy.github.io';
-const headers={'Content-Type':'application/json','Access-Control-Allow-Origin':ORIGIN,'Access-Control-Allow-Headers':'authorization,apikey,content-type','Access-Control-Allow-Methods':'POST,OPTIONS','Vary':'Origin'};
-const reply=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status,headers});
+const ALLOWED_ORIGINS=new Set(['https://jouunyyy.github.io','https://voltz.midiahost.pt']);
+const baseHeaders={'Content-Type':'application/json','Access-Control-Allow-Headers':'authorization,apikey,content-type','Access-Control-Allow-Methods':'POST,OPTIONS','Vary':'Origin'};
 
 const serviceHeaders=()=>{const out:Record<string,string>={apikey:SERVICE_KEY,'Content-Type':'application/json'};if(SERVICE_KEY.startsWith('eyJ'))out.Authorization=`Bearer ${SERVICE_KEY}`;return out};
 async function callRpc(name:string,body:Record<string,unknown>){
@@ -22,6 +21,9 @@ async function rpc(userId:string,action:string,input:Record<string,unknown>={}){
  return callRpc('voltz_teacher_command',{p_user:userId,p_action:action,p_input:input});
 }
 Deno.serve(async request=>{
+ const origin=request.headers.get('Origin')||'';
+ const headers={...baseHeaders,'Access-Control-Allow-Origin':ALLOWED_ORIGINS.has(origin)?origin:'https://voltz.midiahost.pt'};
+ const reply=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status,headers});
  if(request.method==='OPTIONS')return new Response('ok',{headers});
  if(request.method!=='POST')return reply({error:'Método não permitido.'},405);
  try{
