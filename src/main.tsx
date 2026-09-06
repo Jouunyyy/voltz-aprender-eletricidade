@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import AuthApp from "./supabase-auth";
 import { reportTelemetry, startTelemetry } from "./telemetry";
+import { installLearningTelemetry } from "./learning-telemetry";
 import "./globals.css";
 
 const SUPABASE_URL="https://utgtvdmafmehjgebyhqk.supabase.co";
@@ -36,6 +37,7 @@ async function consumeOAuthCallback(){
 async function start(){
   try{await consumeOAuthCallback()}catch(error){console.error("OAuth callback failed",error)}
   startTelemetry();
+  installLearningTelemetry();
   ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
       <AppErrorBoundary><AuthApp /></AppErrorBoundary>
