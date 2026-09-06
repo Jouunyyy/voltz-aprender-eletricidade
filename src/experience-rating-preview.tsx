@@ -1,22 +1,45 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Star } from 'lucide-react';
+import { deferRating, loadRatingEligibility, submitRating, type RatingPromptState } from './rating-api';
 import './experience-rating-preview.css';
 
 const asset = (path:string) => `${import.meta.env.BASE_URL}${path}`;
 
-export default function ExperienceRatingPreview(){
+type Props={userId:string;previewMode:boolean};
+
+export default function ExperienceRatingPreview({userId,previewMode}:Props){
   const [open,setOpen]=useState(false);
   const [hovered,setHovered]=useState(0);
   const [selected,setSelected]=useState(0);
   const [thanks,setThanks]=useState(false);
+  const [completedCount,setCompletedCount]=useState(0);
+  const [promptState,setPromptState]=useState<RatingPromptState>({answered:false,defer_count:0,last_deferred_completed_count:0});
+  const [saving,setSaving]=useState(false);
   const dialogRef=useRef<HTMLDivElement>(null);
   const previousFocus=useRef<HTMLElement|null>(null);
 
   useEffect(()=>{
-    const timer=window.setTimeout(()=>setOpen(true),350);
-    return()=>window.clearTimeout(timer);
-  },[]);
+    let active=true;
+    let timer=0;
+    let interval=0;
+    const check=async()=>{
+      if(previewMode){
+        timer=window.setTimeout(()=>{if(active)setOpen(true)},350);
+        return;
+      }
+      try{
+        const next=await loadRatingEligibility(userId);
+        if(!active)return;
+        setCompletedCount(next.completedCount);
+        setPromptState(next.state);
+        if(next.eligible)timer=window.setTimeout(()=>{if(active)setOpen(true)},350);
+      }catch(error){console.error('Voltz rating eligibility failed',error)}
+    };
+    void check();
+    if(!previewMode)interval=window.setInterval(()=>{if(!open)void check()},20000);
+    return()=>{active=false;window.clearTimeout(timer);window.clearInterval(interval)};
+  },[userId,previewMode,open]);
 
   useEffect(()=>{
     if(!open)return;
@@ -37,9 +60,26 @@ export default function ExperienceRatingPreview(){
     return()=>{document.removeEventListener('keydown',onKeyDown);document.body.style.overflow=previousOverflow;previousFocus.current?.focus()};
   },[open]);
 
-  const choose=(rating:number)=>{
-    setSelected(rating);setHovered(rating);setThanks(true);
-    window.setTimeout(()=>setOpen(false),850);
+  const choose=async(rating:number)=>{
+    if(saving)return;
+    setSelected(rating);setHovered(rating);setSaving(true);
+    try{
+      await submitRating(userId,rating,previewMode);
+      setThanks(true);
+      window.setTimeout(()=>setOpen(false),850);
+    }catch(error){console.error('Voltz rating save failed',error);setSelected(0);setHovered(0)}
+    finally{setSaving(false)}
+  };
+  const later=async()=>{
+    if(saving)return;
+    if(previewMode){setOpen(false);return}
+    setSaving(true);
+    try{
+      const deferCount=await deferRating(userId,completedCount,promptState);
+      setPromptState({...promptState,defer_count:deferCount,last_deferred_completed_count:completedCount});
+      setOpen(false);
+    }catch(error){console.error('Voltz rating defer failed',error)}
+    finally{setSaving(false)}
   };
   const move=(rating:number,event:React.KeyboardEvent<HTMLButtonElement>)=>{
     let next=rating;
@@ -60,9 +100,9 @@ export default function ExperienceRatingPreview(){
       {!thanks?<>
         <h2 id="experience-modal-title">Como está a ser a tua experiência no Voltz?</h2>
         <div className="experience-stars" role="group" aria-label="Avaliação de 1 a 5 estrelas" onMouseLeave={()=>setHovered(selected)}>
-          {[1,2,3,4,5].map(rating=><button key={rating} type="button" className={`experience-star ${rating<=active?'active':''}`} aria-label={`${rating} ${rating===1?'estrela':'estrelas'}`} aria-pressed={selected===rating} onMouseEnter={()=>setHovered(rating)} onFocus={()=>setHovered(rating)} onClick={()=>choose(rating)} onKeyDown={event=>move(rating,event)}><Star aria-hidden="true" fill={rating<=active?'currentColor':'none'}/></button>)}
+          {[1,2,3,4,5].map(rating=><button key={rating} type="button" disabled={saving} className={`experience-star ${rating<=active?'active':''}`} aria-label={`${rating} ${rating===1?'estrela':'estrelas'}`} aria-pressed={selected===rating} onMouseEnter={()=>setHovered(rating)} onFocus={()=>setHovered(rating)} onClick={()=>void choose(rating)} onKeyDown={event=>move(rating,event)}><Star aria-hidden="true" fill={rating<=active?'currentColor':'none'}/></button>)}
         </div>
-        <button type="button" className="experience-later" onClick={()=>setOpen(false)}>Agora não</button>
+        <button type="button" className="experience-later" disabled={saving} onClick={()=>void later()}>Agora não</button>
       </>:<div className="experience-thanks" role="status"><h2>Obrigado pela tua opinião ⚡</h2></div>}
     </div>
   </div>,document.body);
