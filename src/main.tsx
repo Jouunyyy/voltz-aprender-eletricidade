@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import AuthApp from "./supabase-auth";
+import QuestionReportBridge from "./question-report";
 import { reportTelemetry, startTelemetry } from "./telemetry";
 import { installLearningTelemetry } from "./learning-telemetry";
 import "./globals.css";
@@ -40,7 +41,7 @@ async function start(){
   installLearningTelemetry();
   ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-      <AppErrorBoundary><AuthApp /></AppErrorBoundary>
+      <AppErrorBoundary><><AuthApp /><QuestionReportBridge/></></AppErrorBoundary>
     </React.StrictMode>,
   );
 }
