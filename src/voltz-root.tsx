@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { GraduationCap, Shield } from 'lucide-react';
+import { BookOpen, GraduationCap, Home, Shield, UserRound, Zap } from 'lucide-react';
 import FullVoltzApp from './full-voltz-app';
 import VoltzAdmin from './voltz-admin';
 import VoltzTeachers, { StudentClassPanel } from './voltz-teachers';
@@ -59,19 +59,33 @@ export default function VoltzRoot(props:Props){
   return()=>{observer.disconnect();if(queued)cancelAnimationFrame(queued)};
  },[adminOpen,teacherOpen,canTeacher,canAdmin]);
 
- const teacherButton=<button className="nav-item teacher-launcher" onClick={()=>setTeacherOpen(true)} aria-label="Abrir Voltz Professores"><GraduationCap/><span>Professores</span></button>;
- const adminButton=<button className="nav-item admin-launcher" onClick={()=>setAdminOpen(true)} aria-label="Abrir Voltz Admin"><Shield/><span>Admin</span></button>;
+ const openBase=(view:'percurso'|'manual'|'live'|'perfil')=>{
+  setAdminOpen(false);setTeacherOpen(false);
+  requestAnimationFrame(()=>window.dispatchEvent(new CustomEvent('voltz-open-view',{detail:view})));
+ };
+ const openTeachers=()=>{setAdminOpen(false);setTeacherOpen(true)};
+ const openAdmin=()=>{setTeacherOpen(false);setAdminOpen(true)};
+ const teacherButton=<button className="nav-item teacher-launcher" onClick={openTeachers} aria-label="Abrir Voltz Professores"><GraduationCap/><span>Professores</span></button>;
+ const adminButton=<button className="nav-item admin-launcher" onClick={openAdmin} aria-label="Abrir Voltz Admin"><Shield/><span>Admin</span></button>;
  const navExtras=<>{canTeacher&&teacherButton}{canAdmin&&adminButton}</>;
- const roleBadge=<div className={`role-profile-entry ${canAdmin?'is-admin':'is-teacher'}`}>{canAdmin?<Shield/>:<GraduationCap/>}<div><strong>{canAdmin?'Administrador Voltz':'Professor Voltz'}</strong><span>{canAdmin?'Acesso à gestão operacional e ao Voltz Professores.':'A tua conta tem acesso ao Voltz Professores.'}</span></div>{canTeacher&&<button className="primary-button" onClick={()=>setTeacherOpen(true)}>Abrir Voltz Professores</button>}{canAdmin&&<button className="primary-button admin-profile-button" onClick={()=>setAdminOpen(true)}>Admin</button>}</div>;
+ const roleBadge=<div className={`role-profile-entry ${canAdmin?'is-admin':'is-teacher'}`}>{canAdmin?<Shield/>:<GraduationCap/>}<div><strong>{canAdmin?'Administrador Voltz':'Professor Voltz'}</strong><span>{canAdmin?'Acesso à gestão operacional e ao Voltz Professores.':'A tua conta tem acesso ao Voltz Professores.'}</span></div>{canTeacher&&<button className="primary-button" onClick={openTeachers}>Abrir Voltz Professores</button>}{canAdmin&&<button className="primary-button admin-profile-button" onClick={openAdmin}>Admin</button>}</div>;
  const reviewLevel=(levelId:string)=>{requestAnimationFrame(()=>window.dispatchEvent(new CustomEvent('voltz-open-level',{detail:levelId})))};
- const openLive=()=>{setTeacherOpen(false);requestAnimationFrame(()=>window.dispatchEvent(new CustomEvent('voltz-open-view',{detail:'live'})))};
+ const openLive=()=>openBase('live');
+ const roleNav=(adminOpen||teacherOpen)&&<nav className="role-global-nav" aria-label="Navegação principal do Voltz">
+  <button onClick={()=>openBase('percurso')}><Home/><span>Percurso</span></button>
+  <button onClick={()=>openBase('manual')}><BookOpen/><span>Manual</span></button>
+  <button onClick={()=>openBase('live')}><Zap/><span>Voltz Live</span></button>
+  {canTeacher&&<button className={teacherOpen?'active':''} onClick={openTeachers}><GraduationCap/><span>Professores</span></button>}
+  <button onClick={()=>openBase('perfil')}><UserRound/><span>Perfil</span></button>
+  {canAdmin&&<button className={adminOpen?'active':''} onClick={openAdmin}><Shield/><span>Admin</span></button>}
+ </nav>;
 
  return <>
   <div className={(adminOpen||teacherOpen)?'voltz-app-host is-admin-hidden':'voltz-app-host'} aria-hidden={(adminOpen||teacherOpen)||undefined}>
    <FullVoltzApp user={props.user} loadRemote={props.loadRemote} saveRemote={props.saveRemote} emailConsent={props.emailConsent} emailPreferencesReady={props.emailPreferencesReady} onEmailConsent={props.onEmailConsent} onSendEmailTests={props.onSendEmailTests} onSignOut={props.onSignOut}/>
   </div>
-  {adminOpen&&canAdmin&&<VoltzAdmin request={props.adminRequest} onExit={()=>setAdminOpen(false)}/>} 
-  {teacherOpen&&canTeacher&&<VoltzTeachers request={teacherRequest} onExit={()=>setTeacherOpen(false)} onOpenLive={openLive}/>} 
+  {(adminOpen||teacherOpen)&&<div className="role-area">{adminOpen&&canAdmin&&<VoltzAdmin request={props.adminRequest} onExit={()=>openBase('percurso')}/>} {teacherOpen&&canTeacher&&<VoltzTeachers request={teacherRequest} onExit={()=>openBase('percurso')} onOpenLive={openLive}/>}</div>}
+  {roleNav}
   {!adminOpen&&!teacherOpen&&targets.sidebar&&createPortal(navExtras,targets.sidebar)}
   {!adminOpen&&!teacherOpen&&targets.mobile&&createPortal(navExtras,targets.mobile)}
   {!adminOpen&&!teacherOpen&&canTeacher&&targets.profileHero&&createPortal(roleBadge,targets.profileHero)}
