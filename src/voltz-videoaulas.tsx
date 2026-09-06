@@ -9,12 +9,14 @@ type Props = { user: User; onExit: () => void; onOpenLevel: (levelId: string) =>
 type Page = { kind: 'home' } | { kind: 'category'; categoryId: string } | { kind: 'lesson'; categoryId: string; videoId: string };
 const asset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
 const icons = [GraduationCap, Wrench, Zap, Trophy, Star];
+const scrollVideoTop = () => requestAnimationFrame(() => document.querySelector<HTMLElement>('.video-role-area')?.scrollTo({ top: 0, left: 0, behavior: 'auto' }));
 
 export default function VoltzVideoaulas({ user, onExit, onOpenLevel, onChallenge }: Props) {
   const [page, setPage] = useState<Page>({ kind: 'home' });
   const [rows, setRows] = useState<VideoProgressRow[]>([]);
   const [progressError, setProgressError] = useState('');
   const progress = useMemo(() => new Map(rows.map((row) => [row.video_id, row])), [rows]);
+  const navigate = (next: Page) => { setPage(next); scrollVideoTop(); };
   const refresh = async () => {
     try { setRows(await loadVideoProgress(user.id)); setProgressError(''); }
     catch { setProgressError('Não foi possível carregar o progresso das videoaulas.'); }
@@ -24,9 +26,9 @@ export default function VoltzVideoaulas({ user, onExit, onOpenLevel, onChallenge
   const category = page.kind !== 'home' ? videoLessonCategories.find((item) => item.id === page.categoryId) : undefined;
   const lesson = page.kind === 'lesson' ? category?.videos.find((item) => item.id === page.videoId) : undefined;
   return <section className="video-shell">
-    {page.kind === 'home' && <VideoHome completedTotal={completedTotal} progress={progress} onOpen={(categoryId) => setPage({ kind: 'category', categoryId })} onExit={onExit} error={progressError} />}
-    {page.kind === 'category' && category && <VideoCategoryPage category={category} progress={progress} onBack={() => setPage({ kind: 'home' })} onOpen={(videoId) => setPage({ kind: 'lesson', categoryId: category.id, videoId })} error={progressError} />}
-    {page.kind === 'lesson' && category && lesson && <VideoLessonPage user={user} category={category} lesson={lesson} saved={progress.get(lesson.id)} onBack={() => setPage({ kind: 'category', categoryId: category.id })} onSaved={refresh} onOpenLevel={onOpenLevel} onChallenge={onChallenge} />}
+    {page.kind === 'home' && <VideoHome completedTotal={completedTotal} progress={progress} onOpen={(categoryId) => navigate({ kind: 'category', categoryId })} onExit={onExit} error={progressError} />}
+    {page.kind === 'category' && category && <VideoCategoryPage category={category} progress={progress} onBack={() => navigate({ kind: 'home' })} onOpen={(videoId) => navigate({ kind: 'lesson', categoryId: category.id, videoId })} error={progressError} />}
+    {page.kind === 'lesson' && category && lesson && <VideoLessonPage user={user} category={category} lesson={lesson} saved={progress.get(lesson.id)} onBack={() => navigate({ kind: 'category', categoryId: category.id })} onSaved={refresh} onOpenLevel={onOpenLevel} onChallenge={onChallenge} />}
   </section>;
 }
 
