@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { GraduationCap, Shield } from 'lucide-react';
 import FullVoltzApp from './full-voltz-app';
 import VoltzAdmin from './voltz-admin';
+import './voltz-role.css';
 
 export type VoltzRole='user'|'teacher'|'admin';
 type User={id:string;name:string;email:string;avatar?:string};
@@ -46,7 +47,7 @@ export default function VoltzRoot(props:Props){
   return()=>{observer.disconnect();if(queued)cancelAnimationFrame(queued)};
  },[adminOpen,canAdmin]);
 
- const adminButton=(mobile=false)=><button className="nav-item admin-launcher" onClick={()=>setAdminOpen(true)} aria-label="Abrir Voltz Admin"><Shield/><span>{mobile?'Admin':'Admin'}</span></button>;
+ const adminButton=<button className="nav-item admin-launcher" onClick={()=>setAdminOpen(true)} aria-label="Abrir Voltz Admin"><Shield/><span>Admin</span></button>;
  const roleBadge=<div className={`role-profile-entry ${canAdmin?'is-admin':'is-teacher'}`}>{canAdmin?<Shield/>:<GraduationCap/>}<div><strong>{canAdmin?'Administrador Voltz':'Professor Voltz'}</strong><span>{canAdmin?'Acesso à gestão operacional da plataforma.':'Acesso de professor ativo nesta conta.'}</span></div>{canAdmin&&<button className="primary-button" onClick={()=>setAdminOpen(true)}>Abrir Voltz Admin</button>}</div>;
 
  return <>
@@ -54,8 +55,8 @@ export default function VoltzRoot(props:Props){
    <FullVoltzApp user={props.user} loadRemote={props.loadRemote} saveRemote={props.saveRemote} emailConsent={props.emailConsent} emailPreferencesReady={props.emailPreferencesReady} onEmailConsent={props.onEmailConsent} onSendEmailTests={props.onSendEmailTests} onSignOut={props.onSignOut}/>
   </div>
   {adminOpen&&canAdmin&&<VoltzAdmin request={props.adminRequest} onExit={()=>setAdminOpen(false)}/>} 
-  {!adminOpen&&canAdmin&&targets.sidebar&&createPortal(adminButton(),targets.sidebar)}
-  {!adminOpen&&canAdmin&&targets.mobile&&createPortal(adminButton(true),targets.mobile)}
+  {!adminOpen&&canAdmin&&targets.sidebar&&createPortal(adminButton,targets.sidebar)}
+  {!adminOpen&&canAdmin&&targets.mobile&&createPortal(adminButton,targets.mobile)}
   {!adminOpen&&(canAdmin||isTeacher)&&targets.profile&&createPortal(roleBadge,targets.profile)}
  </>;
 }
