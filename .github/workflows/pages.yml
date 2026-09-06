@@ -5,17 +5,14 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
-  pages: write
-  id-token: write
 concurrency:
-  group: pages
+  group: voltz-production
   cancel-in-progress: true
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    env:
+      FTP_PASSWORD: ${{ secrets.VOLTZ_FTP_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,11 +22,18 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
-      - uses: actions/configure-pages@v5
+      - name: Publicar por FTPS
+        if: ${{ env.FTP_PASSWORD != '' }}
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
-          enablement: true
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          server: ftp.midiahost.pt
+          username: "Voltz@voltz.midiahost.pt"
+          password: ${{ env.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          local-dir: ./dist/
+          server-dir: subD/Voltz/
+      - name: Avisar se faltar password FTPS
+        if: ${{ env.FTP_PASSWORD == '' }}
+        run: |
+          echo "Build concluído, mas o deploy foi ignorado porque o secret VOLTZ_FTP_PASSWORD ainda não está configurado."
