@@ -42,6 +42,7 @@ export default function VoltzRoot(props:Props){
  const [targets,setTargets]=useState<Targets>(emptyTargets);
  const canAdmin=props.role==='admin';
  const canTeacher=props.role==='teacher'||props.role==='admin';
+ const ratingPreview=import.meta.env.VITE_RATING_PREVIEW==='true'||(canAdmin&&new URLSearchParams(location.search).get('ratingPreview')==='1');
  useEffect(()=>{
   let queued=0;
   const scan=()=>{
@@ -134,6 +135,6 @@ export default function VoltzRoot(props:Props){
   {videoOpen&&<div className="role-area video-role-area"><VoltzVideoaulas user={props.user} onExit={closeRoleArea} onOpenLevel={levelId=>openCourseTarget(levelId,false)} onChallenge={levelId=>openCourseTarget(levelId,true)}/></div>}
   {teacherOpen&&canTeacher&&<div className="role-area"><VoltzTeachers request={teacherRequest} onExit={closeRoleArea} onOpenLive={openLive}/></div>}
   {adminOpen&&canAdmin&&<div className="role-area"><VoltzAdmin request={props.adminRequest} onExit={closeRoleArea}/></div>}
-  <ExperienceRatingPreview/>
+  <ExperienceRatingPreview userId={props.user.id} previewMode={ratingPreview}/>
  </>;
 }
