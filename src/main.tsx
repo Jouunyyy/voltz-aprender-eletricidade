@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import AuthApp from "./supabase-auth";
+import { startTelemetry } from "./telemetry";
 import "./globals.css";
 
 const SUPABASE_URL="https://utgtvdmafmehjgebyhqk.supabase.co";
@@ -25,7 +26,6 @@ async function consumeOAuthCallback(){
   const accessToken=hash.get("access_token")!;
   const refreshToken=hash.get("refresh_token")||"";
   const expiresIn=Number(hash.get("expires_in")||3600);
-  // Retira credenciais OAuth do URL antes de qualquer outro pedido.
   history.replaceState({},"",location.pathname+location.search);
   const response=await fetch(`${SUPABASE_URL}/auth/v1/user`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${accessToken}`}});
   if(!response.ok)throw new Error("Não foi possível concluir o início de sessão com Google.");
@@ -35,6 +35,7 @@ async function consumeOAuthCallback(){
 
 async function start(){
   try{await consumeOAuthCallback()}catch(error){console.error("OAuth callback failed",error)}
+  startTelemetry();
   ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
       <AppErrorBoundary><AuthApp /></AppErrorBoundary>
