@@ -42,6 +42,8 @@ export default function VoltzRoot(props:Props){
    const mobile=document.querySelector('.mobile-nav');
    const profileHero=document.querySelector('.profile-hero');
    const profilePage=document.querySelector('.profile-page');
+   const versionBadge=document.querySelector<HTMLElement>('.version-badge');
+   if(versionBadge)versionBadge.textContent='v3.2 · Voltz atualizado';
    document.querySelectorAll<HTMLButtonElement>('.sidebar nav>.nav-item,.mobile-nav>.nav-item').forEach(item=>{
     const label=item.querySelector('span')?.textContent?.trim()||'';
     Object.values(navClassByLabel).forEach(className=>item.classList.remove(className));
