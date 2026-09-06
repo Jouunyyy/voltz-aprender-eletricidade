@@ -18,6 +18,7 @@ export default function ExperienceRatingPreview({userId,previewMode}:Props){
   const [saving,setSaving]=useState(false);
   const dialogRef=useRef<HTMLDivElement>(null);
   const previousFocus=useRef<HTMLElement|null>(null);
+  const previewShown=useRef(false);
 
   useEffect(()=>{
     let active=true;
@@ -25,6 +26,8 @@ export default function ExperienceRatingPreview({userId,previewMode}:Props){
     let interval=0;
     const check=async()=>{
       if(previewMode){
+        if(previewShown.current)return;
+        previewShown.current=true;
         timer=window.setTimeout(()=>{if(active)setOpen(true)},350);
         return;
       }
