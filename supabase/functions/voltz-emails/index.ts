@@ -2,10 +2,11 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
 const CRON_SECRET = Deno.env.get("EMAIL_CRON_SECRET") ?? "";
-const SITE_URL = "https://jouunyyy.github.io/voltz-aprender-eletricidade/";
+const SITE_URL = (Deno.env.get("VOLTZ_PUBLIC_SITE_URL") || "https://jouunyyy.github.io/voltz-aprender-eletricidade/").replace(/\/?$/, "/");
 const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/voltz-emails`;
 const HAPPY_FAISCA = `${SITE_URL}faisca-email-happy-v2.jpg`;
 const SAD_FAISCA = `${SITE_URL}faisca-email-saudades-v2.jpg`;
+const ALLOWED_ORIGINS = new Set(["https://jouunyyy.github.io", "https://voltz.midiahost.pt"]);
 
 type Preferences = {
   user_id: string;
@@ -20,13 +21,24 @@ type Preferences = {
   test_sent_at: string | null;
 };
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://jouunyyy.github.io",
-  "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info, x-cron-secret",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Vary": "Origin",
+type CertificateRow = {
+  id: string;
+  user_id: string;
+  certificate_code: string;
+  display_name: string;
+  completed_at: string;
+  email_sent_at: string | null;
+  email_status: string;
 };
-const jsonHeaders = { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" };
+
+function corsHeadersFor(origin: string) {
+  return {
+    "Access-Control-Allow-Origin": ALLOWED_ORIGINS.has(origin) ? origin : "https://jouunyyy.github.io",
+    "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info, x-cron-secret",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Vary": "Origin",
+  };
+}
 
 function escapeHtml(value: string) {
   return value.replace(/[&<>'"]/g, (character) => ({
@@ -70,6 +82,31 @@ function emailShell(options: {
       Recebeste este email porque autorizaste comunicações de aprendizagem do Voltz.<br>
       <a href="${options.unsubscribeUrl}" style="color:#365e91">Cancelar estes emails</a> · <a href="${SITE_URL}" style="color:#365e91">Abrir Voltz</a>
     </td></tr>
+  </table>
+</td></tr></table></body></html>`;
+}
+
+function certificateShell(certificate: CertificateRow) {
+  const name = firstName(certificate.display_name);
+  const code = escapeHtml(certificate.certificate_code);
+  const certificateUrl = `${SITE_URL}?certificate=${encodeURIComponent(certificate.certificate_code)}`;
+  return `<!doctype html>
+<html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;background:#f3f7fc;color:#10213d;font-family:Arial,Helvetica,sans-serif">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0">O teu certificado Voltz já está disponível.</div>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f7fc;padding:24px 10px"><tr><td align="center">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#fff;border:1px solid #dce6f3;border-radius:24px;overflow:hidden">
+    <tr><td style="background:linear-gradient(135deg,#0a58da,#09275a);padding:24px 30px;color:#fff;font-size:25px;font-weight:800">⚡ Voltz</td></tr>
+    <tr><td align="center" style="padding:30px 30px 10px"><img src="${HAPPY_FAISCA}" width="190" alt="Faísca, a mascote do Voltz, a celebrar a tua conclusão" style="display:block;width:190px;max-width:68%;height:auto;border:0;border-radius:22px"></td></tr>
+    <tr><td style="padding:12px 34px 34px">
+      <p style="margin:0 0 10px;color:#1268f4;font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase">Percurso concluído · 50/50</p>
+      <h1 style="margin:0 0 18px;font-size:31px;line-height:1.12;color:#10213d">Parabéns, ${name}!</h1>
+      <p style="margin:0 0 16px;font-size:17px;line-height:1.55;color:#52637b">Concluíste os 50 níveis do percurso Voltz — Aprender Eletricidade.</p>
+      <div style="font-size:16px;line-height:1.6;color:#34465f"><p style="margin:0 0 12px">O teu certificado de conclusão já está disponível.</p><p style="margin:0">Código do certificado:<br><strong style="color:#1268f4">${code}</strong></p></div>
+      <p style="margin:28px 0"><a href="${certificateUrl}" style="display:inline-block;background:#ffd21f;color:#10213d;text-decoration:none;font-size:16px;font-weight:800;padding:14px 22px;border-radius:13px">Ver o meu certificado</a></p>
+      <p style="margin:0;font-size:14px;line-height:1.5;color:#6b7b91">Até já,<br><strong>A equipa Voltz e a Faísca</strong></p>
+    </td></tr>
+    <tr><td style="background:#edf4fc;padding:20px 30px;color:#718096;font-size:12px;line-height:1.5">Este é um email transacional associado à conclusão do teu percurso. Não altera as tuas preferências de comunicações de aprendizagem.<br><a href="${SITE_URL}" style="color:#365e91">Abrir Voltz</a></td></tr>
   </table>
 </td></tr></table></body></html>`;
 }
@@ -141,6 +178,14 @@ async function rest(path: string, init: RequestInit = {}) {
   return response;
 }
 
+async function logEmail(userId: string, status: "sent" | "failed", providerId?: string, errorSafe?: string) {
+  await rest("voltz_admin.email_logs", {
+    method: "POST",
+    headers: { Prefer: "return=minimal", "Content-Profile": "voltz_admin" },
+    body: JSON.stringify({ user_id: userId, type: "certificate", status, provider_id: providerId || null, error_safe: errorSafe || null }),
+  }).catch((error) => console.error("certificate email log failed", error instanceof Error ? error.message : "unknown"));
+}
+
 async function sendEmail(to: string, subject: string, html: string, test = false) {
   if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY não configurada");
   const response = await fetch("https://api.resend.com/emails", {
@@ -171,6 +216,12 @@ async function authenticatedUser(request: Request) {
 async function getPreferences(userId: string) {
   const response = await rest(`email_preferences?user_id=eq.${encodeURIComponent(userId)}&select=*`);
   const rows = await response.json() as Preferences[];
+  return rows[0] ?? null;
+}
+
+async function getCertificate(userId: string) {
+  const response = await rest(`certificates?user_id=eq.${encodeURIComponent(userId)}&select=id,user_id,certificate_code,display_name,completed_at,email_sent_at,email_status&limit=1`);
+  const rows = await response.json() as CertificateRow[];
   return rows[0] ?? null;
 }
 
@@ -209,6 +260,45 @@ async function sendClaimed(preferences: Preferences, completed: number, field: "
   }
 }
 
+async function sendCertificate(user: { id: string; email?: string }) {
+  const certificate = await getCertificate(user.id);
+  if (!certificate) return { error: "Certificado não encontrado.", status: 404 };
+  if (certificate.email_sent_at || certificate.email_status === "sent") return { alreadySent: true, sent: true };
+  if (!user.email) return { error: "A conta não tem email disponível.", status: 409 };
+
+  const claimResponse = await rest(`certificates?user_id=eq.${encodeURIComponent(user.id)}&email_sent_at=is.null&email_status=in.(pending,failed)&select=id`, {
+    method: "PATCH",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({ email_status: "sending", email_last_error: null }),
+  });
+  const claimed = await claimResponse.json() as { id: string }[];
+  if (!claimed.length) {
+    const current = await getCertificate(user.id);
+    return current?.email_sent_at || current?.email_status === "sent"
+      ? { alreadySent: true, sent: true }
+      : { alreadySending: true, sent: false };
+  }
+
+  try {
+    const provider = await sendEmail(user.email, "Concluíste o Voltz — o teu certificado está pronto 🎓⚡", certificateShell(certificate));
+    const now = new Date().toISOString();
+    await rest(`certificates?user_id=eq.${encodeURIComponent(user.id)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ email_status: "sent", email_sent_at: now, email_last_error: null }),
+    });
+    await logEmail(user.id, "sent", typeof provider?.id === "string" ? provider.id : undefined);
+    return { sent: true, alreadySent: false };
+  } catch (error) {
+    const safe = error instanceof Error ? error.message.slice(0, 300) : "Erro desconhecido";
+    await rest(`certificates?user_id=eq.${encodeURIComponent(user.id)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ email_status: "failed", email_last_error: safe }),
+    }).catch(() => undefined);
+    await logEmail(user.id, "failed", undefined, safe);
+    throw error;
+  }
+}
+
 async function runBatch() {
   const response = await rest("email_preferences?consent=eq.true&select=*");
   const rows = await response.json() as Preferences[];
@@ -237,10 +327,10 @@ async function runBatch() {
 
 Deno.serve(async (request) => {
   const url = new URL(request.url);
+  const corsHeaders = corsHeadersFor(request.headers.get("Origin") ?? "");
+  const jsonHeaders = { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" };
   try {
-    if (request.method === "OPTIONS") {
-      return new Response("ok", { headers: corsHeaders });
-    }
+    if (request.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
     if (request.method === "GET" && url.pathname.endsWith("/health")) {
       return new Response(JSON.stringify({ ready: Boolean(RESEND_API_KEY && CRON_SECRET), resendConfigured: Boolean(RESEND_API_KEY), cronConfigured: Boolean(CRON_SECRET) }), { headers: jsonHeaders });
     }
@@ -260,6 +350,14 @@ Deno.serve(async (request) => {
     if (body.action === "batch") {
       if (!CRON_SECRET || request.headers.get("x-cron-secret") !== CRON_SECRET) return new Response(JSON.stringify({ error: "Não autorizado" }), { status: 401, headers: jsonHeaders });
       return new Response(JSON.stringify(await runBatch()), { headers: jsonHeaders });
+    }
+
+    if (body.action === "send-certificate") {
+      const user = await authenticatedUser(request);
+      if (!user?.id) return new Response(JSON.stringify({ error: "Sessão inválida" }), { status: 401, headers: jsonHeaders });
+      const result = await sendCertificate(user);
+      if ((result as any).error) return new Response(JSON.stringify({ error: (result as any).error }), { status: Number((result as any).status || 409), headers: jsonHeaders });
+      return new Response(JSON.stringify(result), { headers: jsonHeaders });
     }
 
     if (body.action === "send-test") {
