@@ -5,6 +5,7 @@ import FullVoltzApp from './full-voltz-app';
 import VoltzAdmin from './voltz-admin';
 import VoltzTeachers, { StudentClassPanel } from './voltz-teachers';
 import VoltzVideoaulas from './voltz-videoaulas';
+import ExperienceRatingPreview from './experience-rating-preview';
 import { categories } from './curriculum';
 import { teacherRequest } from './teacher-api';
 import './voltz-role.css';
@@ -133,5 +134,6 @@ export default function VoltzRoot(props:Props){
   {videoOpen&&<div className="role-area video-role-area"><VoltzVideoaulas user={props.user} onExit={closeRoleArea} onOpenLevel={levelId=>openCourseTarget(levelId,false)} onChallenge={levelId=>openCourseTarget(levelId,true)}/></div>}
   {teacherOpen&&canTeacher&&<div className="role-area"><VoltzTeachers request={teacherRequest} onExit={closeRoleArea} onOpenLive={openLive}/></div>}
   {adminOpen&&canAdmin&&<div className="role-area"><VoltzAdmin request={props.adminRequest} onExit={closeRoleArea}/></div>}
+  <ExperienceRatingPreview/>
  </>;
 }
