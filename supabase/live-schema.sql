@@ -19,6 +19,7 @@ create table voltz_live.participants (
  joined_at timestamptz not null default now(), last_seen_at timestamptz not null default now(),
  departed boolean not null default false, primary key(session_id,user_id)
 );
+create index live_participants_user on voltz_live.participants(user_id);
 create table voltz_live.questions (
  session_id uuid references voltz_live.sessions(id) on delete cascade, position integer not null,
  content jsonb not null, primary key(session_id,position)
@@ -30,6 +31,7 @@ create table voltz_live.answers (
  foreign key(session_id,position) references voltz_live.questions(session_id,position) on delete cascade,
  foreign key(session_id,user_id) references voltz_live.participants(session_id,user_id) on delete cascade
 );
+create index live_answers_participant on voltz_live.answers(session_id,user_id);
 create table voltz_live.limits(user_id uuid references auth.users(id) on delete cascade, bucket text, window_at timestamptz not null, attempts integer not null, primary key(user_id,bucket));
 alter table voltz_live.sessions enable row level security;
 alter table voltz_live.participants enable row level security;
