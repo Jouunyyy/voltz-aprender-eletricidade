@@ -7,11 +7,28 @@ const SUPABASE_URL="https://utgtvdmafmehjgebyhqk.supabase.co";
 const SUPABASE_KEY="sb_publishable_RJmuDpACfRDdDjS66HRCSQ_hTtxAfht";
 const SESSION_KEY="voltz-auth-session";
 
+// Safari/iOS mais antigos não expõem AbortSignal.timeout. O Live usa pedidos
+// com timeout, por isso disponibilizamos uma implementação compatível antes
+// de renderizar a aplicação.
+if(typeof AbortSignal!=="undefined"&&typeof (AbortSignal as typeof AbortSignal&{timeout?:(ms:number)=>AbortSignal}).timeout!=="function"){
+  (AbortSignal as typeof AbortSignal&{timeout:(ms:number)=>AbortSignal}).timeout=(ms:number)=>{
+    const controller=new AbortController();
+    window.setTimeout(()=>controller.abort(),ms);
+    return controller.signal;
+  };
+}
+
 class AppErrorBoundary extends React.Component<{children:React.ReactNode},{error:Error|null}>{
   state:{error:Error|null}={error:null};
   static getDerivedStateFromError(error:Error){return {error}}
   componentDidCatch(error:Error,info:React.ErrorInfo){console.error("Voltz runtime error",error,info)}
-  render(){if(this.state.error)return <main className="auth-page"><section className="auth-panel"><span className="eyebrow">Voltz</span><h2>Não foi possível abrir esta área.</h2><p>Ocorreu um erro inesperado. A tua sessão e o teu progresso não foram apagados.</p><button className="primary-button auth-submit" onClick={()=>{history.replaceState({},"",location.pathname+location.search);location.reload()}}>Voltar a abrir o Voltz</button></section></main>;return this.props.children}
+  render(){
+    if(this.state.error){
+      const message=(this.state.error?.message||"Erro de runtime").replace(/eyJ[A-Za-z0-9._-]+/g,"[token ocultado]").slice(0,220);
+      return <main className="auth-page"><section className="auth-panel"><span className="eyebrow">Voltz</span><h2>Não foi possível abrir esta área.</h2><p>Ocorreu um erro inesperado. A tua sessão e o teu progresso não foram apagados.</p><p className="auth-error" role="alert"><strong>Diagnóstico:</strong> {message}</p><button className="primary-button auth-submit" onClick={()=>{history.replaceState({},"",location.pathname);location.reload()}}>Voltar ao Voltz</button></section></main>;
+    }
+    return this.props.children;
+  }
 }
 
 async function consumeOAuthCallback(){
@@ -20,7 +37,6 @@ async function consumeOAuthCallback(){
   const accessToken=hash.get("access_token")!;
   const refreshToken=hash.get("refresh_token")||"";
   const expiresIn=Number(hash.get("expires_in")||3600);
-  // Remove OAuth credentials from the visible URL before any network request.
   history.replaceState({},"",location.pathname+location.search);
   const response=await fetch(`${SUPABASE_URL}/auth/v1/user`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${accessToken}`}});
   if(!response.ok)throw new Error("Não foi possível concluir o início de sessão com Google.");
