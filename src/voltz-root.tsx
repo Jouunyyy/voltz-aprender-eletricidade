@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CirclePlay, GraduationCap, Shield } from 'lucide-react';
 import FullVoltzApp from './full-voltz-app';
@@ -7,6 +7,8 @@ import VoltzTeachers, { StudentClassPanel } from './voltz-teachers';
 import VoltzVideoaulas from './voltz-videoaulas';
 import ExperienceRatingPreview from './experience-rating-preview';
 import AdminRatings from './admin-ratings';
+import { CertificateProfilePanel, CertificateViewer, CompletionCertificateModal } from './certificate-system';
+import { issueMyCertificate, loadMyCertificate, type VoltzCertificate } from './certificate-api';
 import { categories } from './curriculum';
 import { teacherRequest } from './teacher-api';
 import './voltz-role.css';
@@ -35,14 +37,56 @@ const scrollToVoltzTop=()=>{
  document.querySelector<HTMLElement>('.main')?.scrollTo({top:0,left:0,behavior:'auto'});
  document.querySelector<HTMLElement>('.role-area')?.scrollTo({top:0,left:0,behavior:'auto'});
 };
+const completedLevels=(data:Data|null)=>data?.completedLessons.filter(item=>item.startsWith('course-')).length||0;
+const qualifiesForCertificate=(data:Data|null)=>Boolean(data?.completedLessons.includes('manual-iniciacao')&&completedLevels(data)===50);
 
 export default function VoltzRoot(props:Props){
  const [adminOpen,setAdminOpen]=useState(false);
  const [teacherOpen,setTeacherOpen]=useState(false);
  const [videoOpen,setVideoOpen]=useState(false);
  const [targets,setTargets]=useState<Targets>(emptyTargets);
+ const [progressSnapshot,setProgressSnapshot]=useState<Data|null>(null);
+ const [certificate,setCertificate]=useState<VoltzCertificate|null>(null);
+ const [certificateLoading,setCertificateLoading]=useState(true);
+ const [certificateError,setCertificateError]=useState('');
+ const [newCertificate,setNewCertificate]=useState<VoltzCertificate|null>(null);
+ const [certificateEmailWarning,setCertificateEmailWarning]=useState('');
+ const [certificateViewCode,setCertificateViewCode]=useState<string|null>(()=>new URLSearchParams(location.search).get('certificate'));
+ const issueInFlight=useRef<Promise<void>|null>(null);
  const canAdmin=props.role==='admin';
  const canTeacher=props.role==='teacher'||props.role==='admin';
+
+ const refreshCertificate=async()=>{
+  setCertificateLoading(true);setCertificateError('');
+  try{const next=await loadMyCertificate();setCertificate(next)}
+  catch(error){setCertificateError(error instanceof Error?error.message:'Erro ao carregar certificado.')}
+  finally{setCertificateLoading(false)}
+ };
+ const maybeIssueCertificate=(data:Data|null)=>{
+  if(!qualifiesForCertificate(data))return Promise.resolve();
+  if(issueInFlight.current)return issueInFlight.current;
+  const task=issueMyCertificate().then(result=>{
+   setCertificate(result.certificate);setCertificateLoading(false);setCertificateError('');
+   if(result.email?.status==='failed')setCertificateEmailWarning(result.email.error||'O email do certificado não foi enviado.');
+   if(result.created)setNewCertificate(result.certificate);
+  }).catch(error=>{
+   const message=error instanceof Error?error.message:'Erro ao gerar certificado.';
+   setCertificateError(message);setCertificateLoading(false);
+  }).finally(()=>{issueInFlight.current=null});
+  issueInFlight.current=task;return task;
+ };
+ const loadRemote=async()=>{
+  const data=await props.loadRemote();
+  if(data){setProgressSnapshot(data);void maybeIssueCertificate(data)}
+  return data;
+ };
+ const saveRemote=async(data:Data)=>{
+  await props.saveRemote(data);
+  setProgressSnapshot(data);
+  await maybeIssueCertificate(data);
+ };
+
+ useEffect(()=>{void refreshCertificate()},[props.user.id]);
  useEffect(()=>{
   let queued=0;
   const scan=()=>{
@@ -52,7 +96,7 @@ export default function VoltzRoot(props:Props){
    const profileHero=document.querySelector('.profile-hero');
    const profilePage=document.querySelector('.profile-page');
    const versionBadge=document.querySelector<HTMLElement>('.version-badge');
-   if(versionBadge)versionBadge.textContent='v3.3 · Videoaulas';
+   if(versionBadge)versionBadge.textContent='v3.4 · Certificados';
    document.querySelectorAll<HTMLButtonElement>('.sidebar nav>.nav-item,.mobile-nav>.nav-item').forEach(item=>{
     const label=item.querySelector('span')?.textContent?.trim()||'';
     Object.values(navClassByLabel).forEach(className=>item.classList.remove(className));
@@ -122,20 +166,33 @@ export default function VoltzRoot(props:Props){
   const label=button?.querySelector('span')?.textContent?.trim();
   if(label==='Percurso'||label==='Manual'||label==='Voltz Live'||label==='Perfil')closeRoleArea();
  };
+ const showCertificate=(item:VoltzCertificate)=>{
+  const url=new URL(location.href);url.searchParams.delete('certificado');url.searchParams.delete('print');url.searchParams.set('certificate',item.code);history.pushState({},'',url);setCertificateViewCode(item.code);window.scrollTo({top:0,left:0,behavior:'auto'});
+ };
+ const downloadCertificate=(item:VoltzCertificate)=>{
+  const url=new URL(`${location.origin}${import.meta.env.BASE_URL}`);url.searchParams.set('certificate',item.code);url.searchParams.set('print','1');window.open(url.toString(),'_blank','noopener,noreferrer');
+ };
+ const closeCertificateViewer=()=>{const url=new URL(location.href);url.searchParams.delete('certificate');url.searchParams.delete('print');history.replaceState({},'',url);setCertificateViewCode(null);requestAnimationFrame(scrollToVoltzTop)};
+ const retryCertificate=()=>{if(qualifiesForCertificate(progressSnapshot))void maybeIssueCertificate(progressSnapshot);else void refreshCertificate()};
+ const continueAfterCertificate=()=>{setNewCertificate(null);setCertificateEmailWarning('');requestAnimationFrame(()=>openBaseView('Percurso'))};
  const roleOpen=adminOpen||teacherOpen||videoOpen;
+
+ if(certificateViewCode)return <CertificateViewer code={certificateViewCode} onBack={closeCertificateViewer} autoPrint={new URLSearchParams(location.search).get('print')==='1'}/>;
 
  return <>
   <div className={`voltz-app-host ${roleOpen?'has-role-area':''}`} onClickCapture={handleBaseNavigation}>
-   <FullVoltzApp user={props.user} loadRemote={props.loadRemote} saveRemote={props.saveRemote} emailConsent={props.emailConsent} emailPreferencesReady={props.emailPreferencesReady} onEmailConsent={props.onEmailConsent} onSendEmailTests={props.onSendEmailTests} onSignOut={props.onSignOut}/>
+   <FullVoltzApp user={props.user} loadRemote={loadRemote} saveRemote={saveRemote} emailConsent={props.emailConsent} emailPreferencesReady={props.emailPreferencesReady} onEmailConsent={props.onEmailConsent} onSendEmailTests={props.onSendEmailTests} onSignOut={props.onSignOut}/>
   </div>
   {targets.sidebar&&createPortal(navExtras,targets.sidebar)}
   {targets.mobile&&createPortal(navExtras,targets.mobile)}
   {!roleOpen&&canTeacher&&targets.profileHero&&createPortal(roleBadge,targets.profileHero)}
+  {!roleOpen&&targets.profilePage&&createPortal(<CertificateProfilePanel completed={completedLevels(progressSnapshot)} certificate={certificate} loading={certificateLoading} error={certificateError} onRetry={retryCertificate} onView={showCertificate} onDownload={downloadCertificate}/>,targets.profilePage)}
   {!roleOpen&&targets.profilePage&&createPortal(<StudentClassPanel request={teacherRequest} onReview={reviewLevel}/>,targets.profilePage)}
   {videoOpen&&<div className="role-area video-role-area"><VoltzVideoaulas user={props.user} onExit={closeRoleArea} onOpenLevel={levelId=>openCourseTarget(levelId,false)} onChallenge={levelId=>openCourseTarget(levelId,true)}/></div>}
   {teacherOpen&&canTeacher&&<div className="role-area"><VoltzTeachers request={teacherRequest} onExit={closeRoleArea} onOpenLive={openLive}/></div>}
   {adminOpen&&canAdmin&&<div className="role-area"><VoltzAdmin request={props.adminRequest} onExit={closeRoleArea}/></div>}
   <AdminRatings request={props.adminRequest} visible={adminOpen&&canAdmin}/>
   <ExperienceRatingPreview userId={props.user.id} previewMode={false}/>
+  {newCertificate&&<CompletionCertificateModal certificate={newCertificate} emailWarning={certificateEmailWarning} onView={()=>{setNewCertificate(null);showCertificate(newCertificate)}} onContinue={continueAfterCertificate}/>} 
  </>;
 }
