@@ -28,6 +28,11 @@ async function token(){
  return s.access_token as string;
 }
 
+async function reportLiveFailure(access:string,message:string,action:string){
+ const safe=String(message||'Falha Voltz Live').replace(/(access_token|refresh_token|provider_token|authorization|bearer)[^\s]*/gi,'[redacted]').slice(0,500);
+ try{await fetch(`${SUPABASE_URL}/rest/v1/rpc/voltz_report_error`,{method:'POST',headers:{apikey:KEY,Authorization:`Bearer ${access}`,'Content-Type':'application/json'},body:JSON.stringify({p_source:'live',p_message:safe,p_route:`live:${String(action).slice(0,80)}`,p_stack:null})})}catch{}
+}
+
 export async function liveRequest<T=LiveResponse>(action:string,input:unknown={},signal?:AbortSignal):Promise<T>{
  const access=await token();
  const controller=!signal?new AbortController():null;
@@ -35,11 +40,16 @@ export async function liveRequest<T=LiveResponse>(action:string,input:unknown={}
  try{
   const response=await fetch(`${SUPABASE_URL}/functions/v1/voltz-live`,{method:'POST',headers:{apikey:KEY,Authorization:`Bearer ${access}`,'Content-Type':'application/json'},body:JSON.stringify({action,input}),signal:signal||controller!.signal});
   const data=await response.json().catch(()=>null);
-  if(data===null||data===undefined)throw new Error('O servidor devolveu uma resposta inválida. Tenta novamente.');
-  if(!response.ok||(typeof data==='object'&&!Array.isArray(data)&&data?.error))throw new Error((typeof data==='object'&&!Array.isArray(data)&&data?.error)||'Não foi possível ligar ao Live. Tenta novamente.');
+  if(data===null||data===undefined){void reportLiveFailure(access,`${response.status} resposta inválida`,action);throw new Error('O servidor devolveu uma resposta inválida. Tenta novamente.');}
+  if(!response.ok||(typeof data==='object'&&!Array.isArray(data)&&data?.error)){
+   const message=(typeof data==='object'&&!Array.isArray(data)&&data?.error)||'Não foi possível ligar ao Live. Tenta novamente.';
+   if(response.status>=500)void reportLiveFailure(access,`${response.status} ${message}`,action);
+   throw new Error(message);
+  }
   return data as T;
  }catch(error){
-  if(error instanceof DOMException&&error.name==='AbortError')throw new Error('A ligação ao Voltz Live demorou demasiado. Tenta novamente.');
+  if(error instanceof DOMException&&error.name==='AbortError'){void reportLiveFailure(access,'Timeout ao comunicar com Voltz Live',action);throw new Error('A ligação ao Voltz Live demorou demasiado. Tenta novamente.');}
+  if(error instanceof TypeError)void reportLiveFailure(access,error.message,action);
   throw error;
  }finally{if(timeout!==null)window.clearTimeout(timeout)}
 }
