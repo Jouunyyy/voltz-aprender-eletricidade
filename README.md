@@ -29,6 +29,7 @@ npm run dev
 Para validar uma alteração antes de publicar:
 
 ```bash
+npm test
 npm run typecheck
 npm run build
 ```
@@ -36,3 +37,9 @@ npm run build
 ## Publicação
 
 Cada atualização da branch `main` é compilada e publicada automaticamente no GitHub Pages através de GitHub Actions. O diretório `dist/` é gerado pelo CI e não deve ser versionado.
+
+## Documentação e continuidade
+
+Começa pelo [índice de documentação](docs/README.md). Inclui [requisitos](docs/PRD.md), [arquitetura](docs/ARCHITECTURE.md), [regras](docs/RULES.md), [design](docs/DESIGN.md), [tarefas](docs/TASKS.md) e [memória técnica](docs/MEMORY.md).
+
+As orientações para trabalhar no repositório estão em [AGENTS.md](AGENTS.md). Os documentos devem ser atualizados juntamente com as alterações relevantes; não existe atualização automática.
