@@ -1,3 +1,5 @@
+import { readCommand, RequestError } from '../_shared/request.ts';
+const COMMANDS = new Set(["create", "join", "state", "start", "answer", "close", "next", "end", "leave", "list"]);
 import { allLevels, categories } from '../../../src/curriculum.ts';
 import { buildQuiz, shuffle } from '../../../src/quiz.ts';
 const url = Deno.env.get('SUPABASE_URL')!;
@@ -15,11 +17,7 @@ Deno.serve(async request=>{
   if(!auth.ok) return reply({error:'A sessão expirou. Volta a entrar no Voltz.'},401);
   const user=await auth.json();
   if(!user.id||user.is_anonymous) return reply({error:'É necessária uma conta Voltz.'},401);
-  const raw=await request.text();
-  if(raw.length>8192) return reply({error:'Pedido demasiado grande.'},413);
-  const body=JSON.parse(raw);
-  const action=body.action;
-  let input=body.input||{};
+  let {action,input}=await readCommand(request,COMMANDS,8192);
   if(action==='create'){
    const config=input.config;
    const category=categories.find(c=>c.id===config?.categoryId);
@@ -43,5 +41,6 @@ Deno.serve(async request=>{
   const data=await result.json();
   if(!result.ok){console.error('Live database error',data.code);return reply({error:'Não foi possível atualizar a sessão. Tenta novamente.'},500)}
   return reply(data,data.error?400:200);
- }catch(error){console.error('Live request failed',error instanceof Error?error.name:'error');return reply({error:'Não foi possível processar o pedido. Tenta novamente.'},400)}
+ }catch(error){
+  if(error instanceof RequestError)return reply({error:error.message},error.status);console.error('Live request failed',error instanceof Error?error.name:'error');return reply({error:'Não foi possível processar o pedido. Tenta novamente.'},400)}
 });

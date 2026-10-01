@@ -1,3 +1,5 @@
+import { readCommand, RequestError } from '../_shared/request.ts';
+const COMMANDS = new Set(["heartbeat", "report_error", "submit_feedback", "submit_report", "system", "users", "user_detail", "teachers", "schools", "statistics", "ratings", "summary", "set_teacher", "save_school", "assign_teacher_school", "feedback", "reports", "errors", "set_item_status", "emails", "audit"]);
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const ALLOWED_ORIGINS=new Set(['https://jouunyyy.github.io','https://voltz.midiahost.pt']);
@@ -54,12 +56,7 @@ Deno.serve(async request=>{
   const user=await auth.json();
   if(!user.id||user.is_anonymous)return reply({error:'É necessária uma conta Voltz.'},401);
 
-  const raw=await request.text();
-  if(raw.length>12000)return reply({error:'Pedido demasiado grande.'},413);
-  const body=raw?JSON.parse(raw):{};
-  const action=typeof body.action==='string'?body.action:'';
-  const input=body.input&&typeof body.input==='object'?body.input:{};
-
+  const {action,input}=await readCommand(request,COMMANDS);
   if(action==='heartbeat'){await rpc('voltz_activity_touch_server',{p_user:user.id});return reply({ok:true})}
   if(action==='report_error'){await rpc('voltz_error_log_server',{p_user:user.id,p_source:String(input.source||'other'),p_message:String(input.message||'Erro desconhecido'),p_route:input.route?String(input.route):null,p_stack:input.stack?String(input.stack):null});return reply({ok:true})}
   if(action==='submit_feedback'){const id=await rpc('voltz_feedback_submit_server',{p_user:user.id,p_type:input.type,p_title:input.title,p_message:input.message,p_page:input.page||null});return reply({ok:true,id})}
@@ -98,6 +95,7 @@ Deno.serve(async request=>{
   }
   return reply(data,(data as any)?.error?400:200);
  }catch(error){
+  if(error instanceof RequestError)return reply({error:error.message},error.status);
   const diagnostic=error instanceof Error?error.message:'unknown';
   console.error('Voltz Admin request failed',diagnostic);
   const safeCode=diagnostic.startsWith('rpc:')?diagnostic.split(':').slice(0,4).join(':'):diagnostic.startsWith('roles:')?diagnostic:'ADMIN_BACKEND_ERROR';

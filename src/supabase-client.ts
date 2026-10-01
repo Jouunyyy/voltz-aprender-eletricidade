@@ -1,3 +1,4 @@
+// Publishable browser key, not a secret. Access is enforced by Auth, RLS and server role checks.
 export const SUPABASE_URL='https://utgtvdmafmehjgebyhqk.supabase.co';
 export const SUPABASE_KEY='sb_publishable_RJmuDpACfRDdDjS66HRCSQ_hTtxAfht';
 export const SESSION_KEY='voltz-auth-session';

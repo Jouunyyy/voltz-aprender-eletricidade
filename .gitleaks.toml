@@ -1,0 +1,9 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Verified Supabase publishable browser key; no service role privileges (2026-10-01)"
+condition = "AND"
+paths = ['''^src/supabase-client\.ts$''']
+regexTarget = "secret"
+regexes = ['''^sb_publishable_RJmuDpACfRDdDjS66HRCSQ_hTtxAfht$''']

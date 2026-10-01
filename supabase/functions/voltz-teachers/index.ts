@@ -1,3 +1,5 @@
+import { readCommand, RequestError } from '../_shared/request.ts';
+const COMMANDS = new Set(["student_context", "join_class", "leave_class", "mark_recommendation", "dismiss_recommendation", "record_answer", "record_level", "teacher_home", "create_class", "archive_class", "class_detail", "student_detail", "recommend", "link_live"]);
 const SUPABASE_URL=Deno.env.get('SUPABASE_URL')!;
 const SERVICE_KEY=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const ALLOWED_ORIGINS=new Set(['https://jouunyyy.github.io','https://voltz.midiahost.pt']);
@@ -33,12 +35,12 @@ Deno.serve(async request=>{
   if(!auth.ok)return reply({error:'A sessão expirou. Volta a entrar no Voltz.'},401);
   const user=await auth.json();
   if(!user.id||user.is_anonymous)return reply({error:'É necessária uma conta Voltz.'},401);
-  const raw=await request.text();if(raw.length>12000)return reply({error:'Pedido demasiado grande.'},413);
-  const body=raw?JSON.parse(raw):{};const action=typeof body.action==='string'?body.action:'';const input=body.input&&typeof body.input==='object'?body.input:{};
+  const {action,input}=await readCommand(request,COMMANDS);
   const allowed=new Set(['student_context','join_class','leave_class','mark_recommendation','dismiss_recommendation','record_answer','record_level','teacher_home','create_class','archive_class','class_detail','student_detail','recommend','link_live']);
   if(!allowed.has(action))return reply({error:'Ação inválida.'},400);
   const data=await rpc(user.id,action,input);
   if(data?.error){const status=data.error.includes('reservado')||data.error.includes('permissão')?403:400;return reply(data,status)}
   return reply(data);
- }catch(error){const diagnostic=error instanceof Error?error.message:'unknown';console.error('Voltz Professores request failed',diagnostic);const code=diagnostic.startsWith('rpc:')?diagnostic.split(':').slice(0,4).join(':'):'TEACHERS_BACKEND_ERROR';return reply({error:'Não foi possível processar o pedido.',code},500)}
+ }catch(error){
+  if(error instanceof RequestError)return reply({error:error.message},error.status);const diagnostic=error instanceof Error?error.message:'unknown';console.error('Voltz Professores request failed',diagnostic);const code=diagnostic.startsWith('rpc:')?diagnostic.split(':').slice(0,4).join(':'):'TEACHERS_BACKEND_ERROR';return reply({error:'Não foi possível processar o pedido.',code},500)}
 });
