@@ -19,6 +19,8 @@ Para começar: ler RULES, MEMORY e TASKS; depois consultar os documentos relevan
 - [Revisão de segurança de outubro](security-review-2026-10-01.md): alterações e limites da análise.
 - [Histórico administrativo](../supabase/admin-migrations.md): migrations e controlos de Admin.
 
+- [Auditoria de autenticação](auth-review-2026-10-02.md): correções e limites de validação de outubro.
+
 ## Como manter
 
 Atualizar o documento que é fonte do assunto e ligar a ele nos restantes. Distinguir sempre implementação existente, estado observado em produção e proposta futura. Só marcar tarefas concluídas com evidência. Não mover ficheiros da aplicação para organizar documentação.

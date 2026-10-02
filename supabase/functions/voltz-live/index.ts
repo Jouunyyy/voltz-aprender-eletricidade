@@ -4,9 +4,11 @@ import { allLevels, categories } from '../../../src/curriculum.ts';
 import { buildQuiz, shuffle } from '../../../src/quiz.ts';
 const url = Deno.env.get('SUPABASE_URL')!;
 const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const headers = { 'Content-Type':'application/json', 'Access-Control-Allow-Origin':'https://jouunyyy.github.io', 'Access-Control-Allow-Headers':'authorization,apikey,content-type', 'Access-Control-Allow-Methods':'POST,OPTIONS', 'Vary':'Origin' };
-const reply = (data:unknown,status=200)=>new Response(JSON.stringify(data),{status,headers});
+const baseHeaders = { 'Content-Type':'application/json', 'Access-Control-Allow-Origin':'https://jouunyyy.github.io', 'Access-Control-Allow-Headers':'authorization,apikey,content-type', 'Access-Control-Allow-Methods':'POST,OPTIONS', 'Vary':'Origin' };
 Deno.serve(async request=>{
+ const origin=request.headers.get('Origin')||'';
+ const headers={...baseHeaders,'Access-Control-Allow-Origin':['https://jouunyyy.github.io','https://voltz.midiahost.pt'].includes(origin)?origin:'https://jouunyyy.github.io'};
+ const reply = (data:unknown,status=200)=>new Response(JSON.stringify(data),{status,headers});
  if(request.method==='OPTIONS') return new Response('ok',{headers});
  if(request.method!=='POST') return reply({error:'Método não permitido.'},405);
  try {

@@ -1,6 +1,6 @@
 # Memória técnica do projeto
 
-Última atualização: 2026-10-01. Este ficheiro é contexto persistido no repositório; só ajuda uma sessão que o consulte. Não contém credenciais nem substitui o código ou logs de produção.
+Última atualização: 2026-10-02. Este ficheiro é contexto persistido no repositório; só ajuda uma sessão que o consulte. Não contém credenciais nem substitui o código ou logs de produção.
 
 ## Estado de referência
 
@@ -34,3 +34,7 @@ Nesta alteração, foi criada a documentação de produto e manutenção, preser
 ## Próxima sessão
 
 Consultar o pedido do utilizador e [TASKS](TASKS.md), verificar o estado do Git e confirmar qualquer estado remoto necessário. Não repetir correções já aplicadas por causa de alertas históricos. Atualizar esta memória apenas com decisões e resultados verificáveis.
+
+## Intervenção Auth de 2026-10-02
+
+Ver [auditoria Auth](auth-review-2026-10-02.md). Redirect de signup/recovery enviado por query; callback único limpa fragmento antes da rede; recuperação persiste no separador; refresh periódico/retoma e logout protegido de corrida. Google ainda usa Client ID reportado como eliminado. Configuração administrativa e reparação da conta de testes dependem de acesso Auth administrativo. Não declarar o login Google ou a conta de testes resolvidos sem completar essa validação.

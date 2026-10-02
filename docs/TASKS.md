@@ -1,11 +1,12 @@
 # Tarefas
 
-Atualizado: 2026-10-01. Backlog não equivale a autorização para executar todas as entradas. Escolher a tarefa em função do pedido atual.
+Atualizado: 2026-10-02. Backlog não equivale a autorização para executar todas as entradas. Escolher a tarefa em função do pedido atual.
 
 ## Pendentes
 
 | ID | Prioridade | Tarefa | Critério de conclusão / dependência |
 | --- | --- | --- | --- |
+| AUTH-01 | Alta | Em curso: concluir configuração e validação Auth | Código corrigido e testes locais aprovados; faltam acesso administrativo Supabase/Google, conta confirmada e testes reais de login/email. Ver auth-review-2026-10-02.md. |
 | SEC-01 | Alta | Esclarecer discrepância do GitGuard | Nova execução comprovadamente sobre código corrigido, com logs/trechos coerentes. O relatório de da62a8d ainda mostrava Math.random antigo; causa não confirmada. |
 | SEC-02 | Média | Rever proteção de passwords comprometidas | Confirmar disponibilidade no plano, ativar se aplicável e verificar configuração. Advisor indicava desativada; ferramentas usadas não expunham a alteração. |
 | OPS-01 | Média | Concluir publicação MidiaHost, se continuar pretendida | Configurar secret VOLTZ_FTP_PASSWORD por canal seguro, executar workflow e validar destino. GitHub Pages já foi publicado. |

@@ -12,6 +12,7 @@ Não existe servidor Node de aplicação neste repositório: o frontend estátic
 | --- | --- |
 | [src/main.tsx](../src/main.tsx) | Arranque, callback OAuth, erros e validação pública de certificado |
 | [src/supabase-auth.tsx](../src/supabase-auth.tsx) | Autenticação, perfil e ligação ao progresso remoto |
+| [src/auth-session.ts](../src/auth-session.ts) / [src/auth-redirect.ts](../src/auth-redirect.ts) | Callback único, recuperação, logout e redirects por deployment |
 | [src/supabase-client.ts](../src/supabase-client.ts) | Configuração pública e renovação da sessão |
 | [src/voltz-root.tsx](../src/voltz-root.tsx) | Integração das áreas, navegação e certificados |
 | [src/full-voltz-app.tsx](../src/full-voltz-app.tsx) | Percurso, manual, aulas, desafios e perfil |
