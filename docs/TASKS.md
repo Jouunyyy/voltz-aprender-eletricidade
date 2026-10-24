@@ -1,6 +1,6 @@
 # Tarefas
 
-Atualizado: 2026-10-02. Backlog não equivale a autorização para executar todas as entradas. Escolher a tarefa em função do pedido atual.
+Atualizado: 2026-10-24. Backlog não equivale a autorização para executar todas as entradas. Escolher a tarefa em função do pedido atual.
 
 ## Pendentes
 
@@ -16,6 +16,8 @@ Atualizado: 2026-10-02. Backlog não equivale a autorização para executar toda
 | SEC-03 | A decidir | Definir integridade exigida para progresso/certificados | Decisão explícita sobre progresso enviado pelo cliente; se necessário, especificar e testar validação de aprendizagem no servidor. |
 
 ## Concluído com evidência
+
+- [x] DEP-01 — 2026-10-24: Vite 8.3.5, source-map-js 1.2.2 e Node 22.23.4; audit sem vulnerabilidades conhecidas, 27 testes, typecheck e ambos os builds aprovados localmente. Confirmação do deploy depende do workflow deste commit.
 
 - [x] DOC-01 — Estrutura documental com PRD, arquitetura, regras, design, tarefas, memória, índice e orientações de agentes; ligações locais verificadas nesta alteração.
 - [x] SEC-00 — Correções de segurança no commit da62a8d: seis Actions por SHA, Web Crypto, exceção restrita para chave pública e validação partilhada de comandos.

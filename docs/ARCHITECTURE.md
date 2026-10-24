@@ -43,6 +43,8 @@ O frontend pode esconder botões por papel, mas isso não constitui autorizaçã
 
 ## Publicação
 
+A versão Node para desenvolvimento/build está fixada em [.nvmrc](../.nvmrc) e é lida pelo CI. Atualizar este ficheiro quando forem publicadas correções de segurança na linha 22, validando tipos, testes e ambas as bases de deployment.
+
 [pages.yml](../.github/workflows/pages.yml) instala dependências, verifica tipos, corre testes, compila e publica GitHub Pages em pushes para main. Base padrão: `/voltz-aprender-eletricidade/`, configurada em [vite.config.ts](../vite.config.ts).
 
 A publicação FTPS opcional para MidiaHost usa `VOLTZ_FTP_PASSWORD` nos secrets do GitHub e recompila com `VOLTZ_BASE=/`. Na última execução confirmada, foi ignorada por ausência do secret.

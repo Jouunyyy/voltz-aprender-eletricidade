@@ -1,6 +1,6 @@
 # Memória técnica do projeto
 
-Última atualização: 2026-10-02. Este ficheiro é contexto persistido no repositório; só ajuda uma sessão que o consulte. Não contém credenciais nem substitui o código ou logs de produção.
+Última atualização: 2026-10-24. Este ficheiro é contexto persistido no repositório; só ajuda uma sessão que o consulte. Não contém credenciais nem substitui o código ou logs de produção.
 
 ## Estado de referência
 
@@ -38,3 +38,11 @@ Consultar o pedido do utilizador e [TASKS](TASKS.md), verificar o estado do Git 
 ## Intervenção Auth de 2026-10-02
 
 Ver [auditoria Auth](auth-review-2026-10-02.md). Redirect de signup/recovery enviado por query; callback único limpa fragmento antes da rede; recuperação persiste no separador; refresh periódico/retoma e logout protegido de corrida. Google ainda usa Client ID reportado como eliminado. Configuração administrativa e reparação da conta de testes dependem de acesso Auth administrativo. Não declarar o login Google ou a conta de testes resolvidos sem completar essa validação.
+
+## Dependências e Node — 2026-10-24
+
+Revisão baseada em c776f8146a6aaac25693cdbd20c45fa26afe5b70. Vite atualizado de 8.0.16 para 8.3.5 e source-map-js de 1.2.1 para 1.2.2 no lockfile, com dependências transitivas do Vite atualizadas pelo npm. O audit inicial indicou dois pacotes com severidade alta; após atualização, npm audit reportou zero vulnerabilidades conhecidas. Isto não equivale a uma auditoria integral da aplicação.
+
+Node 22.23.4 fixado em .nvmrc e usado pelo workflow. Referência: https://nodejs.org/en/blog/vulnerability/october-2026-security-releases. Não existe PHP nem servidor Node de aplicação neste repositório; não foram alterados outros alojamentos ou computadores. React e código Auth mantidos.
+
+Validação local com Node 22.23.4: 27 testes aprovados, typecheck aprovado, builds com base /voltz-aprender-eletricidade/ e / aprovados. Vite avisa sobre o uso existente de __dirname numa futura versão principal; o build atual passa e a configuração não foi refatorada. O CI e deploy desta alteração devem ser confirmados no run associado ao commit; os testes locais não provam publicação.
