@@ -66,7 +66,8 @@ export async function downloadCertificatePdf(frame: HTMLIFrameElement, code: str
   const context = canvas.getContext('2d');
   if (!context || !qrBox) throw new Error('Não foi possível renderizar o certificado');
   context.save();
-  context.scale(2, 2);
+  // html2canvas leaves its 2× transform active on the returned context.
+  context.setTransform(2, 0, 0, 2, 0, 0);
   icons.forEach(icon => drawIcon(context, icon));
   // Explicit square geometry avoids object-fit/border-radius clipping in html2canvas.
   const { x, y: qrY, width: qrWidth, height: qrHeight } = qrBox;
