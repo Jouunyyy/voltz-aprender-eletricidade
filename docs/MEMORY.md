@@ -74,3 +74,7 @@ O utilizador aprovou os circuitos completos e pediu aplicar o estilo a todos os 
 ## Correção móvel das aulas
 
 Removido max-height de 285 px que deixava gráficos/laboratórios transbordar sobre o texto. Altura automática e grelha de uma coluna até 900 px, controlos e textos ajustados. Prévia inclui aulas reais com os estilos de produção e seleção dos 50 níveis/8 etapas, sem gravar progresso. Validar em `circuitos-cartoon.html?lessons=1`.
+
+## Certificado: composição e PDF
+
+Faísca completa em WebP; mensagem, QR e assinatura em zonas distintas. Download usa o mesmo DOM do certificado, renderizado a 2800×1750 e colocado numa única página A4 horizontal, preservando cores e proporções independentemente da orientação do telemóvel. html2canvas/jsPDF carregados apenas ao descarregar. Prévia de QA sem validade: `circuitos-cartoon.html?certificate=1`. O PDF contém uma imagem de alta resolução e link de validação clicável; o texto não é selecionável.

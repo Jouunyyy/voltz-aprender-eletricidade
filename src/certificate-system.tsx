@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Award, CheckCircle2, Copy, Download, ExternalLink, LockKeyhole, ShieldCheck, XCircle, Zap } from 'lucide-react';
 import { loadMyCertificate, validateCertificate, type PublicCertificateValidation as Validation, type VoltzCertificate } from './certificate-api';
 import './certificate-system.css';
+import { downloadCertificatePdf } from './certificate-pdf';
 
 const asset=(name:string)=>`${import.meta.env.BASE_URL}${name}`;
 const formatDate=(value:string)=>new Date(value).toLocaleDateString('pt-PT',{day:'2-digit',month:'2-digit',year:'numeric'});
@@ -53,10 +54,11 @@ export function CertificateViewer({code,onBack,autoPrint=false}:{code:string;onB
  const [loading,setLoading]=useState(true);
  const frameRef=useRef<HTMLIFrameElement>(null);
  const printed=useRef(false);
+ const [downloading,setDownloading]=useState(false);
  useEffect(()=>{let active=true;setLoading(true);loadMyCertificate().then(value=>{if(!active)return;if(!value||value.code!==code){setError('Certificado não encontrado para esta conta.');setCertificate(null)}else setCertificate(value)}).catch(err=>{if(active)setError(err instanceof Error?err.message:'Erro ao carregar certificado.')}).finally(()=>{if(active)setLoading(false)});return()=>{active=false}},[code]);
- const print=()=>{const win=frameRef.current?.contentWindow;if(!win){setError('PDF indisponível neste momento.');return}try{win.focus();win.print()}catch{setError('Não foi possível abrir a impressão/PDF neste dispositivo.')}};
+ const print=async()=>{if(downloading)return;const frame=frameRef.current;if(!frame)return;setDownloading(true);setError('');try{await downloadCertificatePdf(frame,code)}catch{setError('Não foi possível gerar o PDF. Tenta novamente.')}finally{setDownloading(false)}};
  const ready=()=>{if(autoPrint&&!printed.current){printed.current=true;window.setTimeout(print,250)}};
- return <main className="certificate-viewer-page"><header className="certificate-viewer-head"><button className="ghost-button" onClick={onBack}>← Voltar ao Voltz</button><div><span className="eyebrow"><Award/> Certificado Voltz</span><strong>{code}</strong></div>{certificate&&<button className="primary-button" onClick={print}><Download/> Descarregar PDF</button>}</header>{error&&<div className="certificate-page-error" role="alert">{error}</div>}{loading&&<div className="certificate-page-loading"><Zap/><strong>A carregar o certificado…</strong></div>}{certificate&&<CertificateFrame certificate={certificate} frameRef={frameRef} onReady={ready}/>}</main>;
+ return <main className="certificate-viewer-page"><header className="certificate-viewer-head"><button className="ghost-button" onClick={onBack}>← Voltar ao Voltz</button><div><span className="eyebrow"><Award/> Certificado Voltz</span><strong>{code}</strong></div>{certificate&&<button className="primary-button" disabled={downloading} onClick={()=>void print()}><Download/> {downloading?"A gerar PDF…":"Descarregar PDF"}</button>}</header>{error&&<div className="certificate-page-error" role="alert">{error}</div>}{loading&&<div className="certificate-page-loading"><Zap/><strong>A carregar o certificado…</strong></div>}{certificate&&<CertificateFrame certificate={certificate} frameRef={frameRef} onReady={ready}/>}</main>;
 }
 
 export function PublicCertificateValidation({code}:{code:string}){
