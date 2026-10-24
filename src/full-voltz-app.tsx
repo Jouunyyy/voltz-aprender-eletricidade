@@ -5,6 +5,7 @@ import { Award, BellRing, BookOpen, Check, ChevronRight, Flame, Gauge, Home, Loc
 import { Progress } from "@/components/ui/progress";
 import { allLevels, categories, type Check as QuizCheck, type CourseLevel } from "./curriculum";
 
+import { CartoonArt } from "./cartoon-art";
 import { CartoonCircuitComparison } from "./cartoon-circuits";
 import { buildQuiz, shuffleCheck } from "./quiz";
 import { learningUnits } from "./learning/index";
@@ -176,6 +177,7 @@ function Manual({step,setStep,done,complete}:{step:number;setStep:(n:number)=>vo
 }
 
 function ManualDiagram({kind}:{kind:string}){
+  if(["power","protection","conductors"].includes(kind))return <CartoonArt kind={kind}/>;
   if(kind==="basics")return <div className="manual-diagram basics-local" role="img" aria-label="Circuito em português que relaciona tensão, corrente e resistência"><h3>As três grandezas no circuito</h3><svg viewBox="0 0 430 270" aria-hidden="true"><path d="M70 55 H350 V215 H70 V55"/><path className="current-arrow" d="M145 55 h75 m-14-12 14 12-14 12"/><circle cx="350" cy="135" r="34"/><path d="M330 115 l40 40 M370 115 l-40 40"/><rect x="45" y="100" width="50" height="90" rx="8"/><text x="52" y="135">12 V</text><text x="52" y="158">FONTE</text><text x="224" y="42">CORRENTE (A)</text><text x="305" y="188">RESISTÊNCIA (Ω)</text><text x="126" y="242">TENSÃO: diferença entre dois pontos (V)</text></svg><p>A fonte cria tensão; com o percurso fechado existe corrente; a resistência limita essa corrente.</p></div>;
   if(kind==="parallel")return <CartoonCircuitComparison/>;
   const image=manualImages[kind];if(image)return <figure className="manual-diagram manual-photo"><img src={image.src} alt={image.alt}/><figcaption><strong>{image.caption}</strong><a href={image.href} target="_blank" rel="noreferrer">Imagem: {image.credit}</a></figcaption></figure>;
