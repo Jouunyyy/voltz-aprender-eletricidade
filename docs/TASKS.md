@@ -17,7 +17,7 @@ Atualizado: 2026-10-24. Backlog não equivale a autorização para executar toda
 
 ## Concluído com evidência
 
-- [x] LEARN-01 — 2026-10-24: cinco categorias, 50 casos com solução e erro frequente, 500 perguntas específicas e revisão integrada. 31 testes, typecheck e build aprovados localmente; ver [registo](learning-review-2026-10-24.md).
+- [x] LEARN-01 — 2026-10-24: cinco categorias, 50 casos com solução e erro frequente, 500 perguntas específicas e revisão integrada. 31 testes, typecheck e builds aprovados; CI 40056462984 publicou GitHub Pages e Live v8 foi verificado; ver [registo](learning-review-2026-10-24.md).
 
 - [x] DEP-01 — 2026-10-24: Vite 8.3.5, source-map-js 1.2.2 e Node 22.23.4; audit sem vulnerabilidades conhecidas, 27 testes, typecheck e ambos os builds aprovados localmente. Confirmação do deploy depende do workflow deste commit.
 

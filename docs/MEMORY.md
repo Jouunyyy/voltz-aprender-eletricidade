@@ -50,3 +50,5 @@ Validação local com Node 22.23.4: 27 testes aprovados, typecheck aprovado, bui
 ## Evolução das categorias — 2026-10-24
 
 Substituída a geração de perguntas por frases do currículo por 500 perguntas específicas em `src/learning/`. As aulas têm oito etapas; preservam laboratórios, IDs, XP e aprovação 8/10. O banco é partilhado com Live. 31 testes (incluindo todas as categorias/níveis no handler Live com fronteiras simuladas), typecheck e build passaram localmente. Publicação e limites no [registo da alteração](learning-review-2026-10-24.md). QA-01 continua pendente de revisão profissional independente.
+
+Publicação confirmada: commit a749640, CI 40056462984 e assets iguais ao build limpo. Live v8 publicado e testado por UI (criação, resposta, explicação e término). Inspeção desktop de um caso por categoria; progresso preservado. Safari/iPhone físico e revisão profissional continuam não realizados.

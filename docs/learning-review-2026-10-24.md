@@ -24,7 +24,14 @@ O frontend e a função Live importam o mesmo banco. Salas já criadas conservam
 - Handler Live exercitado com Auth/RPC simulados: cinco seleções de categoria e 50 seleções de nível; ignora perguntas injetadas no pedido.
 - Build GitHub Pages aprovado. O bundle principal passou a cerca de 615 kB (187 kB gzip); Vite avisa acima de 500 kB, sem impedir o build. Separação de bundles fica fora desta alteração de conteúdo.
 - Não foram alterados schema, RLS, papéis ou credenciais.
-- Confirmação de publicação e inspeção no navegador serão registadas após o deploy.
+- Build adicional com base `/` aprovado localmente; FTPS MidiaHost não publicado por falta da configuração secreta existente.
+- Código publicado no commit `a74964066554afaf28c245e5db8d1f7d4fed61ff`; [CI 40056462984](https://github.com/Jouunyyy/voltz-aprender-eletricidade/actions/runs/40056462984) concluiu typecheck, testes, build e deploy GitHub Pages com sucesso.
+- Verificação HTTP: JS `index-Dn3gtv0_.js` e CSS `index-DHJddXc8.css` publicados são byte a byte iguais a um build em checkout limpo. O primeiro build no diretório de trabalho incluía classes detetadas em artefactos locais não versionados; a comparação final usou apenas o checkout publicado.
+- Live versão 8 ACTIVE: os 11 ficheiros publicados coincidem com as fontes verificadas; manteve autenticação própria do handler e configuração anterior. OPTIONS 200 e pedido sem sessão 401.
+- Teste Live autenticado no navegador: criar sala de cinco perguntas do nível Aprendiz 1, iniciar, responder, receber 1000 pontos e explicação correta; terminar a sala pelo comando normal. Não se apagaram respostas nem outros dados.
+- Inspeção no Chrome desktop (viewport com 1363 px): casos aplicados de Aprendiz 1, Ajudante 6, Instalador 8, Técnico 3 e Especialista 10. Soluções reveladas, navegação e revisão final de dez ideias verificadas; ausência de overflow horizontal nas aulas inspecionadas. Não foi executada uma passagem manual pelas 500 perguntas novas.
+- Confirmado que sair de uma etapa e regressar volta a fechar a solução. Confirmado desafio individual com pergunta nova e feedback correto. O progresso permaneceu em 50/50 e 12 500 XP após reload e os testes.
+- Security Advisors: 22 ocorrências INFO de RLS sem políticas e um WARN de proteção contra passwords comprometidas desativada. Não há alterações de base de dados nesta intervenção; não se declarou o projeto sem avisos. [Aviso RLS](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy) e [proteção de passwords](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
 
 ## Referências consultadas e limites
 
