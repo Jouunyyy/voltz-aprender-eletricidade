@@ -17,7 +17,8 @@ Ensinar fundamentos de eletricidade e segurança elétrica através de aulas vis
 
 - Autenticação e perfil; progresso sincronizado por conta.
 - Manual de iniciação e percurso com cinco categorias de dez níveis: Aprendiz, Ajudante, Instalador, Técnico e Especialista.
-- Aulas visuais e desafios de dez perguntas. Aprovação com pelo menos oito respostas certas à primeira tentativa; revisão após erro não apaga o erro da nota.
+- Aulas de oito etapas, com caso aplicado, solução revelável, erro frequente e revisão das dez ideias-chave. Banco de 500 perguntas específicas, dez por nível, partilhado com o Live.
+- Desafios de dez perguntas. Aprovação com pelo menos oito respostas certas à primeira tentativa; revisão após erro não apaga o erro da nota.
 - XP, progressão e apresentação do estado de aprendizagem.
 - Videoaulas organizadas por pares de níveis e registo de progresso. Ter catálogo no código não confirma disponibilidade de todos os vídeos externos.
 - Voltz Live com salas autenticadas, anfitrião, perguntas, respostas e classificação calculada no servidor; ver [especificação](voltz-live.md).

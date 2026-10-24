@@ -11,11 +11,13 @@ Atualizado: 2026-10-24. Backlog não equivale a autorização para executar toda
 | SEC-02 | Média | Rever proteção de passwords comprometidas | Confirmar disponibilidade no plano, ativar se aplicável e verificar configuração. Advisor indicava desativada; ferramentas usadas não expunham a alteração. |
 | OPS-01 | Média | Concluir publicação MidiaHost, se continuar pretendida | Configurar secret VOLTZ_FTP_PASSWORD por canal seguro, executar workflow e validar destino. GitHub Pages já foi publicado. |
 | DATA-01 | Média | Completar reprodução do backend por migrations locais | Inventariar histórico remoto e reconciliar lacunas; reconstruir em ambiente isolado antes de considerar reprodutível. |
-| QA-01 | Média | Rever pedagogicamente os 50 níveis | Checklist por nível: teoria, exemplos, diagramas, respostas e explicações revistos; registar responsável/evidência. |
+| QA-01 | Média | Revisão técnica e pedagógica independente dos 50 níveis | Banco e aulas ampliados em 2026-10-24; falta revisão por profissional qualificado e validação com alunos. Registar responsável/evidência. |
 | MEDIA-01 | Média | Verificar disponibilidade das videoaulas | Conferir links, thumbnails, reprodução móvel e estados de ausência para cada entrada do catálogo. |
 | SEC-03 | A decidir | Definir integridade exigida para progresso/certificados | Decisão explícita sobre progresso enviado pelo cliente; se necessário, especificar e testar validação de aprendizagem no servidor. |
 
 ## Concluído com evidência
+
+- [x] LEARN-01 — 2026-10-24: cinco categorias, 50 casos com solução e erro frequente, 500 perguntas específicas e revisão integrada. 31 testes, typecheck e build aprovados localmente; ver [registo](learning-review-2026-10-24.md).
 
 - [x] DEP-01 — 2026-10-24: Vite 8.3.5, source-map-js 1.2.2 e Node 22.23.4; audit sem vulnerabilidades conhecidas, 27 testes, typecheck e ambos os builds aprovados localmente. Confirmação do deploy depende do workflow deste commit.
 

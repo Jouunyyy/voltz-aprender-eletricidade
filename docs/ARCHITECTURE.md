@@ -17,6 +17,7 @@ Não existe servidor Node de aplicação neste repositório: o frontend estátic
 | [src/voltz-root.tsx](../src/voltz-root.tsx) | Integração das áreas, navegação e certificados |
 | [src/full-voltz-app.tsx](../src/full-voltz-app.tsx) | Percurso, manual, aulas, desafios e perfil |
 | [src/curriculum.ts](../src/curriculum.ts) / [src/quiz.ts](../src/quiz.ts) | Categorias/níveis e construção/baralhamento dos quizzes |
+| [src/learning/index.ts](../src/learning/index.ts) e módulos por categoria | 50 unidades com contexto, caso, solução, erro frequente e 500 perguntas; dependência partilhada pelo frontend e pela Edge Function Live |
 | [src/voltz-live.tsx](../src/voltz-live.tsx) / [src/live-api.ts](../src/live-api.ts) | Interface e cliente HTTP Live |
 | [src/voltz-teachers.tsx](../src/voltz-teachers.tsx) / [src/teacher-api.ts](../src/teacher-api.ts) | Professores, alunos e turmas |
 | [src/voltz-admin.tsx](../src/voltz-admin.tsx) | Gestão administrativa |
@@ -50,3 +51,5 @@ A versão Node para desenvolvimento/build está fixada em [.nvmrc](../.nvmrc) e 
 A publicação FTPS opcional para MidiaHost usa `VOLTZ_FTP_PASSWORD` nos secrets do GitHub e recompila com `VOLTZ_BASE=/`. Na última execução confirmada, foi ignorada por ausência do secret.
 
 Edge Functions são publicadas separadamente no Supabase: fazer push de código não as publica por este workflow. Não reaplicar schemas consolidados como migrations: o histórico administrativo no servidor contém alterações não reproduzidas integralmente pelos ficheiros locais. Conferir [admin-migrations.md](../supabase/admin-migrations.md) e o estado remoto antes de qualquer alteração de schema.
+
+O deploy de `voltz-live` deve incluir `src/learning/*.ts`, `src/quiz.ts`, `src/curriculum.ts` e o parser de pedidos, além do handler. Alterar o banco no GitHub não atualiza automaticamente a função já publicada. Não alterar os IDs dos níveis nem as chaves `course-<id>` ao rever conteúdo.

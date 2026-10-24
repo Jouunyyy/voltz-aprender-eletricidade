@@ -46,3 +46,7 @@ Revisão baseada em c776f8146a6aaac25693cdbd20c45fa26afe5b70. Vite atualizado de
 Node 22.23.4 fixado em .nvmrc e usado pelo workflow. Referência: https://nodejs.org/en/blog/vulnerability/october-2026-security-releases. Não existe PHP nem servidor Node de aplicação neste repositório; não foram alterados outros alojamentos ou computadores. React e código Auth mantidos.
 
 Validação local com Node 22.23.4: 27 testes aprovados, typecheck aprovado, builds com base /voltz-aprender-eletricidade/ e / aprovados. Vite avisa sobre o uso existente de __dirname numa futura versão principal; o build atual passa e a configuração não foi refatorada. O CI e deploy desta alteração devem ser confirmados no run associado ao commit; os testes locais não provam publicação.
+
+## Evolução das categorias — 2026-10-24
+
+Substituída a geração de perguntas por frases do currículo por 500 perguntas específicas em `src/learning/`. As aulas têm oito etapas; preservam laboratórios, IDs, XP e aprovação 8/10. O banco é partilhado com Live. 31 testes (incluindo todas as categorias/níveis no handler Live com fronteiras simuladas), typecheck e build passaram localmente. Publicação e limites no [registo da alteração](learning-review-2026-10-24.md). QA-01 continua pendente de revisão profissional independente.

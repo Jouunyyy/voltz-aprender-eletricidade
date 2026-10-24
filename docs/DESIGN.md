@@ -39,3 +39,7 @@ Usar os assets existentes em [public](../public), incluindo faisca.png e faisca-
 ## Aceitação de alterações visuais
 
 Verificar pelo menos um viewport de telemóvel (referência de trabalho: 390 × 844 CSS px) e um desktop (1440 × 900), ajustando quando o pedido indicar outro dispositivo. Confirmar ausência de scroll horizontal acidental, navegação utilizável, texto não cortado e estados interativos. Estes tamanhos são critérios de revisão, não afirmação de teste já realizado.
+
+## Aulas ampliadas — 2026-10-24
+
+As aulas mantêm laboratórios e esquema nas etapas 4 e 5; acrescentam caso aplicado, erro frequente e revisão final. A solução do caso começa fechada e volta a fechar ao mudar de etapa. A revisão usa `details/summary` nativo e uma lista numerada, com quebra de texto em ecrãs estreitos. O indicador mostra oito etapas; não se promete uma duração fixa para conteúdos de complexidade diferente.
