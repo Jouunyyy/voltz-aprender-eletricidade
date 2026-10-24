@@ -37,3 +37,7 @@ Ao iniciar, marcar uma tarefa explicitamente como em curso. Ao concluir, anotar 
 - CARTOON-02 — Circuitos completos de série e paralelo implementados para substituir o esquema de emojis no Manual e o diagrama da aula Aprendiz 6. Cabos, bateria e duas lâmpadas; estados independentes com controlos por toque/teclado. Aguardar avaliação visual do utilizador antes de generalizar outros circuitos.
 
 - CARTOON-03 — Gráficos didáticos existentes convertidos para o estilo aprovado, com objetos gerados e ligações em código. Validação e publicação registadas em [cartoon-art-rollout.md](cartoon-art-rollout.md); teste num iPhone físico continua por realizar.
+
+## Correção móvel das aulas
+
+Removido max-height de 285 px que deixava gráficos/laboratórios transbordar sobre o texto. Altura automática e grelha de uma coluna até 900 px, controlos e textos ajustados. Prévia inclui aulas reais com os estilos de produção e seleção dos 50 níveis/8 etapas, sem gravar progresso. Validar em `circuitos-cartoon.html?lessons=1`.

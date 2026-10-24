@@ -70,3 +70,7 @@ Integração confirmada no Manual autenticado, capítulo 4. Ajustada apenas a gr
 ## Generalização cartoon — 2026-10-24
 
 O utilizador aprovou os circuitos completos e pediu aplicar o estilo a todos os gráficos didáticos existentes. Gerados seis assets, integrados Manual, laboratórios, circuitos e formas de onda; diagramas conceptuais mantêm conteúdo e recebem estilo cartoon. Não se alterou banco de perguntas, progresso ou backend. Ver [registo e limites](cartoon-art-rollout.md); publicação deve ser confirmada pelo CI e pela prévia pública.
+
+## Correção móvel das aulas
+
+Removido max-height de 285 px que deixava gráficos/laboratórios transbordar sobre o texto. Altura automática e grelha de uma coluna até 900 px, controlos e textos ajustados. Prévia inclui aulas reais com os estilos de produção e seleção dos 50 níveis/8 etapas, sem gravar progresso. Validar em `circuitos-cartoon.html?lessons=1`.

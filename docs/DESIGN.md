@@ -55,3 +55,7 @@ A comparação de série/paralelo no Manual e na aula Aprendiz 6 passa a mostrar
 ## Generalização dos gráficos cartoon
 
 Objetos transparentes gerados em `public/cartoon-art/`, reutilizados por `cartoon-learning.tsx` e `cartoon-art.tsx`. Valores, fórmulas, ligações e estados permanecem em código. O Manual deixa de depender de fotografias externas; laboratórios mantêm controlos e respostas. Perguntas apenas textuais permanecem sem ilustração. Diagramas de avaliação não oferecem controlos ou legendas que revelem a resposta. Ver [registo](cartoon-art-rollout.md).
+
+## Correção móvel das aulas
+
+Removido max-height de 285 px que deixava gráficos/laboratórios transbordar sobre o texto. Altura automática e grelha de uma coluna até 900 px, controlos e textos ajustados. Prévia inclui aulas reais com os estilos de produção e seleção dos 50 níveis/8 etapas, sem gravar progresso. Validar em `circuitos-cartoon.html?lessons=1`.

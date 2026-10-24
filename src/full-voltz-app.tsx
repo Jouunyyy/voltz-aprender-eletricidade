@@ -165,7 +165,7 @@ function ManualDiagram({kind}:{kind:string}){
   return <div className="manual-diagram ready-card"><img src={asset("faisca-mobile.webp")} alt="Faísca, mascote do Voltz"/><h3>Agora já falamos a mesma língua.</h3><p>Segue para Aprendiz · Nível 1.</p></div>;
 }
 
-function Lesson({level,slide,setSlide,startChallenge}:{level:typeof allLevels[number];slide:number;setSlide:(n:number)=>void;startChallenge:()=>void}){
+export function Lesson({level,slide,setSlide,startChallenge}:{level:typeof allLevels[number];slide:number;setSlide:(n:number)=>void;startChallenge:()=>void}){
   const [meterMode,setMeterMode]=useState<"V"|"A"|"Ω">("V");
   const [labVoltage,setLabVoltage]=useState(12);const [labResistance,setLabResistance]=useState(6);
   const [labPower,setLabPower]=useState(1);const [labHours,setLabHours]=useState(2);
