@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1268f4">
+  <meta name="robots" content="noindex">
+  <title>Voltz · Amostra cartoon — Nível 1</title>
+  <link rel="stylesheet" href="./cartoon-pilot/style.css">
+</head>
+<body>
+  <main>
+    <header><a class="brand" href="./"><span aria-hidden="true">ϟ</span> Voltz</a><span class="pill">Amostra visual</span></header>
+    <div class="intro"><p class="eyebrow">APRENDIZ · NÍVEL 1</p><h1>Cinco perguntas.<br>Uma nova forma de ver.</h1><p>Experimenta os objetos cartoon e avalia o estilo.<br>Esta amostra não guarda progresso nem atribui XP.</p></div>
+    <nav id="steps" aria-label="Escolher pergunta"></nav>
+    <article aria-labelledby="question">
+      <div class="question-top"><span id="counter"></span><span id="topic"></span></div>
+      <h2 id="question" tabindex="-1"></h2>
+      <div id="visual" class="visual"></div>
+      <p id="visual-note" class="visual-note"></p>
+      <div id="options" role="group" aria-labelledby="question"></div>
+      <div id="feedback" role="status" hidden></div>
+      <section id="experiment" hidden aria-label="Experimentar depois de responder"></section>
+      <footer><button id="previous" class="secondary">← Anterior</button><button id="next" class="primary">Próxima →</button></footer>
+    </article>
+    <p class="footnote">Objetos ilustrados. Modelos elétricos ideais para aprendizagem.</p>
+    <a class="back" href="./">Voltar ao Voltz</a>
+    <noscript>Ativa JavaScript para experimentar as cinco perguntas.</noscript>
+  </main>
+  <script type="module" src="./cartoon-pilot/app.js"></script>
+</body>
+</html>

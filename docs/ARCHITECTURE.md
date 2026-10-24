@@ -53,3 +53,7 @@ A publicação FTPS opcional para MidiaHost usa `VOLTZ_FTP_PASSWORD` nos secrets
 Edge Functions são publicadas separadamente no Supabase: fazer push de código não as publica por este workflow. Não reaplicar schemas consolidados como migrations: o histórico administrativo no servidor contém alterações não reproduzidas integralmente pelos ficheiros locais. Conferir [admin-migrations.md](../supabase/admin-migrations.md) e o estado remoto antes de qualquer alteração de schema.
 
 O deploy de `voltz-live` deve incluir `src/learning/*.ts`, `src/quiz.ts`, `src/curriculum.ts` e o parser de pedidos, além do handler. Alterar o banco no GitHub não atualiza automaticamente a função já publicada. Não alterar os IDs dos níveis nem as chaves `course-<id>` ao rever conteúdo.
+
+## Amostra visual cartoon
+
+`public/amostra-cartoon.html` é uma página independente para avaliação das cinco primeiras perguntas de `aprendiz-1`. CSS, JavaScript e WebP em `public/cartoon-pilot/`, com caminhos relativos para Pages e domínio na raiz. `questions.js` é uma fotografia das perguntas originais, cuja igualdade é verificada em `tests/cartoon-pilot.test.mjs`. Não inicializa Auth, não usa storage e não faz pedidos ao Supabase. Não altera o banco partilhado nem o quiz em produção.

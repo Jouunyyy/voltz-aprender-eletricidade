@@ -52,3 +52,7 @@ Validação local com Node 22.23.4: 27 testes aprovados, typecheck aprovado, bui
 Substituída a geração de perguntas por frases do currículo por 500 perguntas específicas em `src/learning/`. As aulas têm oito etapas; preservam laboratórios, IDs, XP e aprovação 8/10. O banco é partilhado com Live. 31 testes (incluindo todas as categorias/níveis no handler Live com fronteiras simuladas), typecheck e build passaram localmente. Publicação e limites no [registo da alteração](learning-review-2026-10-24.md). QA-01 continua pendente de revisão profissional independente.
 
 Publicação confirmada: commit a749640, CI 40056462984 e assets iguais ao build limpo. Live v8 publicado e testado por UI (criação, resposta, explicação e término). Inspeção desktop de um caso por categoria; progresso preservado. Safari/iPhone físico e revisão profissional continuam não realizados.
+
+## Piloto visual cartoon — 2026-10-24
+
+Cinco perguntas do primeiro nível numa amostra independente: `public/amostra-cartoon.html`. Objetos gerados com transparência, valores em HTML, respostas e experiências locais. Escopo de avaliação; nenhuma alteração ao progresso, Auth ou ordem aleatória do percurso. 32 testes, typecheck e build local com Node 22.23.4 aprovados. O bundle principal mantém os hashes anteriores. Evidência e limites em [cartoon-pilot.md](cartoon-pilot.md).

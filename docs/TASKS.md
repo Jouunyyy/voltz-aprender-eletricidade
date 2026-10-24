@@ -29,3 +29,7 @@ Atualizado: 2026-10-24. Backlog não equivale a autorização para executar toda
 ## Uso
 
 Ao iniciar, marcar uma tarefa explicitamente como em curso. Ao concluir, anotar data, commit/PR ou outra evidência e resultado da validação. Se bloqueada, indicar dependência concreta. Não remover pendências só para deixar a lista vazia.
+
+## Piloto visual para avaliação
+
+- CARTOON-01 — cinco primeiras perguntas do nível 1 implementadas em amostra independente. 32 testes, typecheck e build local aprovados. Avaliação do utilizador pendente antes de alargar o estilo; ver [registo](cartoon-pilot.md).

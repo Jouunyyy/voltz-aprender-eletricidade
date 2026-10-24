@@ -43,3 +43,7 @@ Verificar pelo menos um viewport de telemóvel (referência de trabalho: 390 × 
 ## Aulas ampliadas — 2026-10-24
 
 As aulas mantêm laboratórios e esquema nas etapas 4 e 5; acrescentam caso aplicado, erro frequente e revisão final. A solução do caso começa fechada e volta a fechar ao mudar de etapa. A revisão usa `details/summary` nativo e uma lista numerada, com quebra de texto em ecrãs estreitos. O indicador mostra oito etapas; não se promete uma duração fixa para conteúdos de complexidade diferente.
+
+## Piloto cartoon — cinco perguntas do nível 1
+
+A amostra pública `amostra-cartoon.html` usa objetos isolados, com transparência, amarelo/azul e contornos azul-escuro. Valores e respostas continuam a ser texto HTML. São as cinco primeiras perguntas na ordem de autoria de `aprendiz-1`; o percurso normal mantém o baralhamento existente. Experiências posteriores à resposta alteram leituras, resistência e estado do interruptor. O piloto não grava progresso e ainda não substitui os visuais dos restantes níveis.

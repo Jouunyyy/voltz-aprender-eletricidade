@@ -1,0 +1,26 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "Approved isolated yellow/blue cartoon multimeter",
+  "prompts": [
+    [
+      "multimetro",
+      "Edit the reference multimeter. Keep exact front-facing composition and yellow blue dimensional cartoon style and blank mint display. Turn ONLY the selector handle to point towards the A position on the upper left (approximately 10 o'clock). COM socket ring must be black rather than red. Remove ALL background glow, haze, shadow: pixels outside the physical object must be completely transparent. Isolated physical object only. No cables, no UI, no added captions. Portrait aspect."
+    ],
+    [
+      "bateria",
+      "Use the reference only for its dimensional cartoon style: saturated yellow rubber/plastic, royal blue panels, thick navy outlines, soft highlights. Generate a single isolated generic rectangular battery with positive and negative terminals on top, front-facing slight three-quarter perspective, blank broad front label panel suitable for numeric HTML overlay. Only physical + and − near terminals, absolutely no numeric values, brand or other words. Rounded polished educational game prop. Actual fully transparent background without glow, shadow, scene, extra objects, captions or UI. Square aspect."
+    ],
+    [
+      "resistencia",
+      "Use the reference only for style: dimensional cartoon educational game prop, yellow and royal blue, thick navy outlines, soft clean highlights. Generate one isolated horizontal adjustable resistor module: small rounded rectangular blue insulated body with yellow rotary knob centered on top/front, two metallic connection terminals extending left and right. No wires, text, numbers, color code bands, backdrop, glow, floor shadow or UI. Front-facing simple symmetric object, generous transparent margin, square aspect. Actual fully transparent background."
+    ],
+    [
+      "interruptor",
+      "Use the reference only for dimensional cartoon style: yellow and blue plastic, navy rounded outlines, soft highlights. Generate one isolated OPEN knife switch on a small rounded blue insulated base, two brass contacts on left and right, conductive silver lever pivoted at left lifted 40 degrees with yellow insulated tip; very clear air gap between raised right tip and right contact. Front-facing slight three-quarter perspective. Two connection terminals extending horizontally left/right. No wires, text, background, glow, floor shadow, labels or UI. Physical object only, actual transparent background. Square aspect."
+    ],
+    [
+      "interruptor-fechado",
+      "Edit only the knife switch in the reference: put the conductive lever DOWN horizontally so its free end is firmly seated in the right contact, making a CLOSED switch. Keep base, contacts, terminals, colors, scale and object placement exactly the same. Fully transparent background, no shadows or glow, no text or extra objects. This is the closed animation state of the same prop."
+    ]
+  ]
+}
