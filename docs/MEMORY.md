@@ -62,3 +62,7 @@ Cinco perguntas do primeiro nível numa amostra independente: `public/amostra-ca
 O utilizador esclareceu que pretende bateria, cabos e lâmpadas ligados, e não objetos isolados quando o tema é um circuito. Implementado componente cartoon reutilizado no Manual (série/paralelo), aula Aprendiz 6 e prévia `circuitos-cartoon.html`. SVG assegura os percursos completos; cada lâmpada pode abrir o circuito/ramo. Não se alteram perguntas, progresso ou Auth. Ver testes `cartoon-circuits.test.mjs`; confirmar CI e inspeção visual do commit antes de declarar publicação.
 
 Validação local desta correção: Node 22.23.4, typecheck aprovado, 34 testes aprovados e build Vite das duas entradas aprovado. O esquema do Manual mantém a posição antes do texto em ecrãs estreitos. Nenhuma alteração de backend.
+
+Publicação inicial confirmada em e36e78e, CI/Pages 40059850344 aprovado. Prévia aberta no browser; desligar L1 por clique em série apaga ambas, e por Enter em paralelo deixa L2 acesa. Ajustado rótulo de lâmpada desligada para não sobrepor o segundo ramo. Safari/iPhone físico ainda não verificado.
+
+Integração confirmada no Manual autenticado, capítulo 4. Ajustada apenas a grelha dos cartões que contêm esta comparação para usar a largura total e evitar espaço vazio excessivo na coluna de texto; restantes capítulos preservados.

@@ -39,8 +39,7 @@ function Circuit({ kind }: { kind: CircuitKind }) {
       <ellipse cy="47" rx="19" ry="5" fill={connected[index] ? '#ffcf23' : '#142d4d'} stroke="#142d4d" strokeWidth="2" />
       <path d="M-22 55 H-12" stroke="#68caff" strokeWidth="3" strokeLinecap="round" />
     </g>
-    <text y="99" textAnchor="middle" className="cartoon-label">L{index + 1} · {lit[index] ? 'acesa' : 'apagada'}</text>
-    {!connected[index] && <text y="118" textAnchor="middle" className="cartoon-open-label">desligada</text>}
+    <text y="99" textAnchor="middle" className="cartoon-label">L{index + 1} · {!connected[index] ? 'desligada' : lit[index] ? 'acesa' : 'apagada'}</text>
   </g>;
   const batteryY = parallel ? 300 : 230;
   return <section className="cartoon-circuit-card" aria-label={`Circuito em ${parallel ? 'paralelo' : 'série'}`}>
