@@ -2,9 +2,9 @@ import { useId, useState } from 'react';
 import { lampStates, type CircuitKind } from './cartoon-circuit-state';
 import './cartoon-circuits.css';
 
-function Circuit({ kind }: { kind: CircuitKind }) {
-  const [connected, setConnected] = useState<[boolean, boolean]>([true, true]);
-  const lit = lampStates(kind, connected);
+export function CartoonCircuit({ kind, initiallyOpen = false, readOnly = false }: { kind: CircuitKind; initiallyOpen?: boolean; readOnly?: boolean }) {
+  const [connected, setConnected] = useState<[boolean, boolean]>([!initiallyOpen, true]);
+  const lit = readOnly ? [false, false] : lampStates(kind, connected);
   const id = useId().replace(/:/g, '');
   const parallel = kind === 'parallel';
   const toggle = (index: number) => setConnected(previous => {
@@ -19,10 +19,11 @@ function Circuit({ kind }: { kind: CircuitKind }) {
   </g>;
   const lamp = (index: number, x: number, y: number) => <g transform={`translate(${x} ${y})`}>
     {lit[index] && <ellipse cy="18" rx="53" ry="55" fill={`url(#${id}-glow)`} />}
-    <g className="cartoon-lamp" role="button" tabIndex={0}
+    <g className="cartoon-lamp" role={readOnly ? undefined : "button"} tabIndex={readOnly ? undefined : 0}
       aria-label={`${connected[index] ? 'Desligar' : 'Ligar'} lâmpada ${index + 1} em ${parallel ? 'paralelo' : 'série'}`}
       aria-pressed={connected[index]}
-      onClick={() => toggle(index)} onKeyDown={event => {
+      onClick={readOnly ? undefined : () => toggle(index)} onKeyDown={event => {
+        if (readOnly) return;
         if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(index); }
       }}>
       <rect className="lamp-focus" x="-52" y="-32" width="104" height="111" rx="20" fill="transparent" />
@@ -39,7 +40,7 @@ function Circuit({ kind }: { kind: CircuitKind }) {
       <ellipse cy="47" rx="19" ry="5" fill={connected[index] ? '#ffcf23' : '#142d4d'} stroke="#142d4d" strokeWidth="2" />
       <path d="M-22 55 H-12" stroke="#68caff" strokeWidth="3" strokeLinecap="round" />
     </g>
-    <text y="99" textAnchor="middle" className="cartoon-label">L{index + 1} · {!connected[index] ? 'desligada' : lit[index] ? 'acesa' : 'apagada'}</text>
+    <text y="99" textAnchor="middle" className="cartoon-label">L{index + 1}{!connected[index] ? ' · aberta' : readOnly ? '' : lit[index] ? ' · acesa' : ' · apagada'}</text>
   </g>;
   const batteryY = parallel ? 300 : 230;
   return <section className="cartoon-circuit-card" aria-label={`Circuito em ${parallel ? 'paralelo' : 'série'}`}>
@@ -67,13 +68,13 @@ function Circuit({ kind }: { kind: CircuitKind }) {
       <image href={`${import.meta.env.BASE_URL}cartoon-pilot/bateria.webp`} x="185" y={batteryY} width="110" height="110" />
       <text x="247" y={batteryY + 65} textAnchor="middle" fill="white" fontSize="19" fontWeight="900">9 V</text>
     </svg>
-    <div className="cartoon-circuit-controls">
+    {!readOnly && <div className="cartoon-circuit-controls">
       {connected.map((on, index) => <button key={index} type="button" aria-pressed={on} onClick={() => toggle(index)}>{on ? 'Desligar' : 'Ligar'} L{index + 1}</button>)}
       <button type="button" onClick={() => setConnected([true, true])}>Repor</button>
-    </div>
-    <p className="cartoon-circuit-status" role="status">{parallel
+    </div>}
+    {!readOnly && <p className="cartoon-circuit-status" role="status">{parallel
       ? connected.every(Boolean) ? 'Cada lâmpada tem o seu percurso entre os mesmos polos da bateria.' : lit.some(Boolean) ? 'Um ramo está aberto. A outra lâmpada continua acesa.' : 'Os dois ramos estão abertos. Ambas as lâmpadas estão apagadas.'
-      : connected.every(Boolean) ? 'O cabo percorre as duas lâmpadas antes de regressar à bateria.' : 'O único percurso está interrompido. Ambas as lâmpadas apagam.'}</p>
+      : connected.every(Boolean) ? 'O cabo percorre as duas lâmpadas antes de regressar à bateria.' : 'O único percurso está interrompido. Ambas as lâmpadas apagam.'}</p>}
   </section>;
 }
 
@@ -81,7 +82,7 @@ export function CartoonCircuitComparison() {
   return <div className="cartoon-circuits">
     <h2>Série e paralelo</h2>
     <p className="cartoon-circuit-intro">Toca numa lâmpada para a desligar. Segue os cabos e observa o que acontece à outra.</p>
-    <div className="cartoon-circuit-grid"><Circuit kind="series"/><Circuit kind="parallel"/></div>
+    <div className="cartoon-circuit-grid"><CartoonCircuit kind="series"/><CartoonCircuit kind="parallel"/></div>
     <p className="cartoon-circuit-note">Modelo com bateria e lâmpadas ideais. O brilho é ilustrativo; as ligações mostram os percursos completos.</p>
   </div>;
 }

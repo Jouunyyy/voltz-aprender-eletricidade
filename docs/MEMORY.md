@@ -66,3 +66,7 @@ Validação local desta correção: Node 22.23.4, typecheck aprovado, 34 testes 
 Publicação inicial confirmada em e36e78e, CI/Pages 40059850344 aprovado. Prévia aberta no browser; desligar L1 por clique em série apaga ambas, e por Enter em paralelo deixa L2 acesa. Ajustado rótulo de lâmpada desligada para não sobrepor o segundo ramo. Safari/iPhone físico ainda não verificado.
 
 Integração confirmada no Manual autenticado, capítulo 4. Ajustada apenas a grelha dos cartões que contêm esta comparação para usar a largura total e evitar espaço vazio excessivo na coluna de texto; restantes capítulos preservados.
+
+## Generalização cartoon — 2026-10-24
+
+O utilizador aprovou os circuitos completos e pediu aplicar o estilo a todos os gráficos didáticos existentes. Gerados seis assets, integrados Manual, laboratórios, circuitos e formas de onda; diagramas conceptuais mantêm conteúdo e recebem estilo cartoon. Não se alterou banco de perguntas, progresso ou backend. Ver [registo e limites](cartoon-art-rollout.md); publicação deve ser confirmada pelo CI e pela prévia pública.

@@ -51,3 +51,7 @@ A amostra pública `amostra-cartoon.html` usa objetos isolados, com transparênc
 ## Circuitos cartoon completos — correção de 2026-10-24
 
 A comparação de série/paralelo no Manual e na aula Aprendiz 6 passa a mostrar bateria, cabos contínuos ligados aos dois polos e duas lâmpadas com casquilhos. O componente SVG/React permite retirar/repor cada lâmpada: em série qualquer abertura apaga ambas; em paralelo só apaga o ramo aberto. Os símbolos, fios e estados são desenhados em código para preservar a topologia; a bateria reutiliza o asset cartoon. Prévia pública em `circuitos-cartoon.html`, com o mesmo componente do produto. O brilho é ilustrativo, não uma comparação de potência.
+
+## Generalização dos gráficos cartoon
+
+Objetos transparentes gerados em `public/cartoon-art/`, reutilizados por `cartoon-learning.tsx` e `cartoon-art.tsx`. Valores, fórmulas, ligações e estados permanecem em código. O Manual deixa de depender de fotografias externas; laboratórios mantêm controlos e respostas. Perguntas apenas textuais permanecem sem ilustração. Diagramas de avaliação não oferecem controlos ou legendas que revelem a resposta. Ver [registo](cartoon-art-rollout.md).
