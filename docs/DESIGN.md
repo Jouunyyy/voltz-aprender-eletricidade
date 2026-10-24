@@ -47,3 +47,7 @@ As aulas mantêm laboratórios e esquema nas etapas 4 e 5; acrescentam caso apli
 ## Piloto cartoon — cinco perguntas do nível 1
 
 A amostra pública `amostra-cartoon.html` usa objetos isolados, com transparência, amarelo/azul e contornos azul-escuro. Valores e respostas continuam a ser texto HTML. São as cinco primeiras perguntas na ordem de autoria de `aprendiz-1`; o percurso normal mantém o baralhamento existente. Experiências posteriores à resposta alteram leituras, resistência e estado do interruptor. O piloto não grava progresso e ainda não substitui os visuais dos restantes níveis.
+
+## Circuitos cartoon completos — correção de 2026-10-24
+
+A comparação de série/paralelo no Manual e na aula Aprendiz 6 passa a mostrar bateria, cabos contínuos ligados aos dois polos e duas lâmpadas com casquilhos. O componente SVG/React permite retirar/repor cada lâmpada: em série qualquer abertura apaga ambas; em paralelo só apaga o ramo aberto. Os símbolos, fios e estados são desenhados em código para preservar a topologia; a bateria reutiliza o asset cartoon. Prévia pública em `circuitos-cartoon.html`, com o mesmo componente do produto. O brilho é ilustrativo, não uma comparação de potência.

@@ -33,3 +33,5 @@ Ao iniciar, marcar uma tarefa explicitamente como em curso. Ao concluir, anotar 
 ## Piloto visual para avaliação
 
 - CARTOON-01 — cinco primeiras perguntas do nível 1 implementadas em amostra independente. 32 testes, typecheck e build local aprovados. Avaliação do utilizador pendente antes de alargar o estilo; ver [registo](cartoon-pilot.md).
+
+- CARTOON-02 — Circuitos completos de série e paralelo implementados para substituir o esquema de emojis no Manual e o diagrama da aula Aprendiz 6. Cabos, bateria e duas lâmpadas; estados independentes com controlos por toque/teclado. Aguardar avaliação visual do utilizador antes de generalizar outros circuitos.

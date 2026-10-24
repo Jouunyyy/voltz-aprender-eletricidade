@@ -56,3 +56,9 @@ Publicação confirmada: commit a749640, CI 40056462984 e assets iguais ao build
 ## Piloto visual cartoon — 2026-10-24
 
 Cinco perguntas do primeiro nível numa amostra independente: `public/amostra-cartoon.html`. Objetos gerados com transparência, valores em HTML, respostas e experiências locais. Escopo de avaliação; nenhuma alteração ao progresso, Auth ou ordem aleatória do percurso. 32 testes, typecheck e build local com Node 22.23.4 aprovados. O código funcional da aplicação principal não foi alterado; os nomes dos bundles podem variar com a deteção de classes no build. Evidência e limites em [cartoon-pilot.md](cartoon-pilot.md).
+
+## Correção do conceito visual — circuitos completos
+
+O utilizador esclareceu que pretende bateria, cabos e lâmpadas ligados, e não objetos isolados quando o tema é um circuito. Implementado componente cartoon reutilizado no Manual (série/paralelo), aula Aprendiz 6 e prévia `circuitos-cartoon.html`. SVG assegura os percursos completos; cada lâmpada pode abrir o circuito/ramo. Não se alteram perguntas, progresso ou Auth. Ver testes `cartoon-circuits.test.mjs`; confirmar CI e inspeção visual do commit antes de declarar publicação.
+
+Validação local desta correção: Node 22.23.4, typecheck aprovado, 34 testes aprovados e build Vite das duas entradas aprovado. O esquema do Manual mantém a posição antes do texto em ecrãs estreitos. Nenhuma alteração de backend.

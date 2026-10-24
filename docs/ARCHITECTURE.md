@@ -57,3 +57,5 @@ O deploy de `voltz-live` deve incluir `src/learning/*.ts`, `src/quiz.ts`, `src/c
 ## Amostra visual cartoon
 
 `public/amostra-cartoon.html` é uma página independente para avaliação das cinco primeiras perguntas de `aprendiz-1`. CSS, JavaScript e WebP em `public/cartoon-pilot/`, com caminhos relativos para Pages e domínio na raiz. `questions.js` é uma fotografia das perguntas originais, cuja igualdade é verificada em `tests/cartoon-pilot.test.mjs`. Não inicializa Auth, não usa storage e não faz pedidos ao Supabase. Não altera o banco partilhado nem o quiz em produção.
+
+`src/cartoon-circuits.tsx` é partilhado pelo Manual, aula Aprendiz 6 e entrada Vite `circuitos-cartoon.html`. O estado elétrico puro fica em `src/cartoon-circuit-state.ts`, com testes dos quatro estados possíveis por associação. A prévia não inicializa autenticação nem grava progresso. A comparação mantém estados locais independentes para série e paralelo.
