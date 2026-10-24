@@ -55,4 +55,4 @@ Publicação confirmada: commit a749640, CI 40056462984 e assets iguais ao build
 
 ## Piloto visual cartoon — 2026-10-24
 
-Cinco perguntas do primeiro nível numa amostra independente: `public/amostra-cartoon.html`. Objetos gerados com transparência, valores em HTML, respostas e experiências locais. Escopo de avaliação; nenhuma alteração ao progresso, Auth ou ordem aleatória do percurso. 32 testes, typecheck e build local com Node 22.23.4 aprovados. O bundle principal mantém os hashes anteriores. Evidência e limites em [cartoon-pilot.md](cartoon-pilot.md).
+Cinco perguntas do primeiro nível numa amostra independente: `public/amostra-cartoon.html`. Objetos gerados com transparência, valores em HTML, respostas e experiências locais. Escopo de avaliação; nenhuma alteração ao progresso, Auth ou ordem aleatória do percurso. 32 testes, typecheck e build local com Node 22.23.4 aprovados. O código funcional da aplicação principal não foi alterado; os nomes dos bundles podem variar com a deteção de classes no build. Evidência e limites em [cartoon-pilot.md](cartoon-pilot.md).

@@ -22,9 +22,13 @@ Prompts finais e referência de cada asset em `cartoon-prompts.json`. Base comum
 
 - Node 22.23.4: 32 testes aprovados; typecheck aprovado; build aprovado.
 - `node --check public/cartoon-pilot/app.js` e `git diff --check` aprovados.
-- JS/CSS principal conserva os hashes do build limpo anterior: `index-Dn3gtv0_.js`, `index-DHJddXc8.css`.
+- Código funcional da aplicação principal preservado. O primeiro build coincidiu com o baseline; após indexar os ficheiros novos, a deteção de classes mudou o CSS e os nomes dos bundles (`index-BTK3q1SB.css`, `index-R-venBrz.js`). Não foi feita refatoração da aplicação.
 - Avisos existentes: chunk principal superior a 500 kB e futuro loader Vite com `__dirname`.
 - Publicação inicial confirmada no commit `806f908`, CI/Pages `40058892648` concluído com sucesso.
 - Browser Chrome: cinco perguntas percorridas, resposta certa e errada, 3→6 A, 15 V/10 Ω = 1,5 A, interruptor fechado por teclado, 12 V/10 Ω = 1,2 A, conclusão e estado sem progresso. Inspeção visual do multímetro confirma visor HTML alinhado e transparência.
 - Ajustado foco ao mudar de pergunta para o enunciado ficar visível após scroll.
 - A verificação específica de viewport 390×844 não foi concluída: a política do navegador bloqueou a abertura do ficheiro local de revisão. Não foi tentado contornar esse bloqueio. CSS responsivo implementado; Safari/iPhone físico não testado. A amostra não substitui a revisão pedagógica independente.
+
+## Publicação verificada
+
+Ajuste de navegação publicado em `3072682`, CI/Pages `40059140338` concluído com sucesso. URL: https://jouunyyy.github.io/voltz-aprender-eletricidade/amostra-cartoon.html . Imagem inicial carregada e sem overflow horizontal no viewport desktop observado (1348 CSS px). O teste não confirma Safari físico nem todos os tamanhos móveis.
