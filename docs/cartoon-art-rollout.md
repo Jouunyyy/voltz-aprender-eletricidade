@@ -16,3 +16,7 @@ Gráficos existentes do Manual, laboratórios e demonstrações das aulas, e dia
 ## Validação
 
 Typecheck, testes e build devem ser consultados no CI associado a este commit. Inspeção visual do deploy deve ser confirmada após a publicação. Não foi testado num iPhone físico. Os esquemas são modelos didáticos, não projetos de instalação.
+
+### Evidência de publicação
+
+Commit de implementação `95a5890bec4c11048b78ea4714b22e764e9560e5`: 34 testes aprovados, typecheck e build aprovados. CI/Pages `40133000887` concluído com sucesso. O site principal serviu `assets/main-Bvgijops.js`, igual ao build local. Prévia publicada inspecionada em Chrome: interruptor abre o circuito, seletor muda entre V/A/Ω, série apaga ambas e paralelo conserva o outro ramo, incluindo controlo por teclado. Viewport de 390 px por iframe: largura útil 375 px e scrollWidth 375 px, sem overflow horizontal. Imagens HTML verificadas carregadas. A área autenticada não foi reaberta nesta sessão (browser sem sessão); validação visual dos componentes feita na prévia pública que os reutiliza. Safari/iPhone físico não testado.
