@@ -151,7 +151,7 @@ function render(focus = false) {
   $('next').textContent = current === 4 ? 'Concluir amostra ✓' : 'Próxima →';
   draw();
   experiment();
-  if (focus) $('question').focus({ preventScroll: true });
+  if (focus) $('question').focus();
 }
 
 $('previous').addEventListener('click', () => { if (current > 0) { current--; render(true); } });
