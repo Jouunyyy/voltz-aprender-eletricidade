@@ -78,3 +78,7 @@ Removido max-height de 285 px que deixava gráficos/laboratórios transbordar so
 ## Certificado: composição e PDF
 
 Faísca completa em WebP; mensagem, QR e assinatura em zonas distintas. Download usa o mesmo DOM do certificado, renderizado a 2800×1750 e colocado numa única página A4 horizontal, preservando cores e proporções independentemente da orientação do telemóvel. html2canvas/jsPDF carregados apenas ao descarregar. Prévia de QA sem validade: `circuitos-cartoon.html?certificate=1`. O PDF contém uma imagem de alta resolução e link de validação clicável; o texto não é selecionável.
+
+## Alinhamento dos símbolos no PDF — 2026-10-25
+
+Exportação desenha os quatro ícones, o raio da marca e o QR diretamente no canvas, a partir das caixas do DOM clonado sem escala. Evita dependência da baseline de emojis e de object-fit/bordas no html2canvas. QR quadrado com margem branca simétrica, sem interpolação; ligação clicável acompanha a sua caixa real. O HTML visível não foi alterado. Typecheck, 34 testes e build locais passaram; confirmar exportação e deploy do commit antes de declarar publicação. Safari físico ainda não testado.
