@@ -20,3 +20,7 @@ Typecheck, testes e build devem ser consultados no CI associado a este commit. I
 ### Evidência de publicação
 
 Commit de implementação `95a5890bec4c11048b78ea4714b22e764e9560e5`: 34 testes aprovados, typecheck e build aprovados. CI/Pages `40133000887` concluído com sucesso. O site principal serviu `assets/main-Bvgijops.js`, igual ao build local. Prévia publicada inspecionada em Chrome: interruptor abre o circuito, seletor muda entre V/A/Ω, série apaga ambas e paralelo conserva o outro ramo, incluindo controlo por teclado. Viewport de 390 px por iframe: largura útil 375 px e scrollWidth 375 px, sem overflow horizontal. Imagens HTML verificadas carregadas. A área autenticada não foi reaberta nesta sessão (browser sem sessão); validação visual dos componentes feita na prévia pública que os reutiliza. Safari/iPhone físico não testado.
+
+### Lâmpada apagada — correção visual
+
+O filtro CSS sobre a imagem SVG mantinha o brilho incorporado na ilustração e o utilizador reportou a lâmpada ainda amarela no Safari. Os circuitos de bateria e iluminação passam a escolher uma imagem apagada própria quando o interruptor abre, sem depender de filtros. Asset `public/cartoon-art/lampada-apagada.webp`, editado com imagegen integrado: preservar enquadramento, base e terminais; vidro cinzento frio, filamento escuro, sem emissão luminosa; fundo transparente.

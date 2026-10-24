@@ -36,7 +36,7 @@ export function CartoonLampCircuit({ initiallyOpen = false, readOnly = false }: 
     <svg viewBox="0 0 460 420" role="img" aria-label={`Circuito com bateria, interruptor ${closed ? 'fechado' : 'aberto'} e lâmpada ${closed ? 'acesa' : 'apagada'}`}>
       <Cable d="M197 311 H50 V142 H78 M192 142 H230 V110 H292 M378 110 H420 V311 H254"/>
       <image href={pilot(closed ? 'interruptor-fechado' : 'interruptor')} x="75" y="55" width="120" height="120"/>
-      <image href={art('lampada')} x="260" y="20" width="150" height="150" style={closed ? undefined : { filter: 'grayscale(1) brightness(.65)' }}/>
+      <image href={art(closed ? 'lampada' : 'lampada-apagada')} x="260" y="20" width="150" height="150"/>
       <image href={pilot('bateria')} x="170" y="300" width="110" height="110"/>
       <text x="135" y="204" textAnchor="middle">{closed ? 'Fechado' : 'Aberto'}</text>
       <text x="335" y="204" textAnchor="middle">Lâmpada</text>
@@ -77,7 +77,7 @@ export function CartoonLighting() {
       <image href={art('quadro')} x="5" y="100" width="150" height="180"/>
       <Cable d="M145 145 H170 V102 H198 M312 102 H350 V120 H392 M478 120 H500 V275 H145"/>
       <image href={pilot(closed ? 'interruptor-fechado' : 'interruptor')} x="195" y="15" width="120" height="120"/>
-      <image href={art('lampada')} x="360" y="30" width="150" height="150" style={closed ? undefined : {filter:'grayscale(1) brightness(.65)'}}/>
+      <image href={art(closed ? 'lampada' : 'lampada-apagada')} x="360" y="30" width="150" height="150"/>
       <text x="160" y="132">L</text><text x="160" y="301">N</text>
       <text x="80" y="310" textAnchor="middle">Quadro / proteção</text>
       <text x="255" y="166" textAnchor="middle">Interruptor</text>
