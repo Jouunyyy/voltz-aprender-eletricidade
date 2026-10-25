@@ -97,3 +97,8 @@ Apresentação Free/Pro/Escolas por baixo do nome, com diálogo de comparação 
 ### Correção visual dos planos
 
 Diálogo montado num portal em document.body para não herdar cores e botões do cabeçalho escuro do Perfil. Cabeçalho sticky, fecho de 44 px, margem automática e dimensões móveis em dvh. Typecheck, 34 testes e build passaram; Safari real não validado nesta alteração.
+
+
+## Centro de ajuda Voltz — 2026-10-25
+
+Criada a entrada pública `/apoio.html`, sem dependência de autenticação, com FAQ, aviso de que os planos pagos ainda não estão ativos e contacto `mailto:voltz@midiahost.pt`. Link incluído no ecrã de entrada e no Perfil. Não recebe nem guarda tickets; publicação remota por confirmar.
