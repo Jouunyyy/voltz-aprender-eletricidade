@@ -68,3 +68,7 @@ O AuthApp carrega VoltzRoot por import dinâmico apenas para uma sessão autenti
 ## Página pública de suporte
 
 `apoio.html` é uma entrada Vite independente, compilada para `apoio.html` no mesmo deployment do site. `src/support-main.tsx` monta a página sem inicializar Auth ou Supabase; `src/voltz-support.tsx` contém perguntas frequentes e links `mailto:`. O URL funciona tanto sob a base GitHub Pages como na raiz de um domínio próprio. Não há API, sistema de tickets ou promessa de envio/receção de resposta.
+
+### Páginas legais públicas
+
+`privacidade.html` e `termos.html` são entradas independentes compiladas no mesmo deployment. `src/legal-main.tsx` monta `src/voltz-legal.tsx`; navegação e links de apoio usam `BASE_URL`. A política descreve recolha observada no Auth, progresso, emails, certificados e telemetria. A identificação/morada do responsável e os prazos de retenção precisam de confirmação antes de remover os avisos de informação pendente.

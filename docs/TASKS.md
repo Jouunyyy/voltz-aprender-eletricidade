@@ -64,3 +64,8 @@ Apresentação Free/Pro/Escolas por baixo do nome, com diálogo de comparação 
 ## Centro de ajuda e suporte — 2026-10-25
 
 - [x] Página pública `apoio.html`, com FAQ e links de email para aprendizagem, pagamentos e conta; ligada ao login e Perfil. Sem backend de tickets. Typecheck, testes e build verificados localmente nesta alteração; deploy ainda não confirmado.
+
+## Páginas legais públicas — 2026-10-25
+
+- [x] Criadas páginas separadas `privacidade.html` e `termos.html`; compilação configurada e links adicionados ao apoio e ao login. 34 testes, typecheck, build Pages, build raiz e diff check passaram.
+- [ ] Confirmar nome legal e morada postal do responsável pelo Voltz e definir prazos de retenção por categoria; atualizar os avisos antes de considerar os textos finais.

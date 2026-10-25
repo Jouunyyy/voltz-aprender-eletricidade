@@ -102,3 +102,7 @@ Diálogo montado num portal em document.body para não herdar cores e botões do
 ## Centro de ajuda Voltz — 2026-10-25
 
 Criada a entrada pública `/apoio.html`, sem dependência de autenticação, com FAQ, aviso de que os planos pagos ainda não estão ativos e contacto `mailto:voltz@midiahost.pt`. Link incluído no ecrã de entrada e no Perfil. Não recebe nem guarda tickets; publicação remota por confirmar.
+
+## Páginas legais Voltz — 2026-10-25
+
+Implementadas duas entradas independentes: `/privacidade.html` e `/termos.html`. A política reflete os dados vistos no Auth, progresso, atividade/erros, emails, certificados, armazenamento de sessão e fornecedores; os Termos explicam limites educativos, conta, propriedade e ausência atual de pagamentos. Avisos visíveis identificam a falta de nome legal/morada do operador e de prazos de retenção confirmados. 34 testes, typecheck, builds Pages/raiz e diff check passaram. Não tratar como informação jurídica final até os dados serem validados.

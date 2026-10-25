@@ -61,6 +61,6 @@ export default function VoltzSupport() {
       <details><summary>O que devo incluir no pedido de ajuda?</summary><p>Descreve o problema, indica o dispositivo e navegador e, se for relevante, o nome da aula. Não envies palavras-passe, códigos de acesso ou dados de cartão.</p></details>
     </section>
 
-    <footer className="support-footer"><span>Voltz · Aprende hoje. Constrói amanhã.</span><a href={mailto("Pedido de apoio Voltz")}><Mail aria-hidden="true" /> {supportEmail}</a></footer>
+    <footer className="support-footer"><span>Voltz · Aprende hoje. Constrói amanhã.</span><div className="support-footer-links"><a href={`${base}privacidade.html`}>Política de Privacidade</a><a href={`${base}termos.html`}>Termos e Condições</a><a href={mailto("Pedido de apoio Voltz")}><Mail aria-hidden="true" /> {supportEmail}</a></div></footer>
   </main>;
 }
