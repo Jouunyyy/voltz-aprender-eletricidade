@@ -49,3 +49,7 @@ Apresentação Free/Pro/Escolas por baixo do nome, com diálogo de comparação 
 ## Centro de ajuda e suporte — 2026-10-25
 
 Página pública em `/apoio.html`, acessível sem sessão, com contactos por email e respostas sobre acesso, progresso, segurança e planos. O contacto usa `mailto:voltz@midiahost.pt`; não existe submissão de tickets nem armazenamento de pedidos no site. A área informa que as adesões pagas ainda não estão ativas.
+
+## Páginas legais — 2026-10-25
+
+Criadas entradas públicas independentes `/privacidade.html` e `/termos.html`, compatíveis com GitHub Pages e domínio raiz. Cobrem Auth Google/email, progresso, atividade, emails opcionais, certificados, armazenamento local, fornecedores, direitos, limites educativos e estado atual sem pagamentos. A identificação legal e morada do responsável, bem como prazos operacionais concretos de retenção, continuam por confirmar e estão assinalados nas páginas.

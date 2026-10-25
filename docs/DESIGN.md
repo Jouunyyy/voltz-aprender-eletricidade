@@ -72,3 +72,7 @@ Exportação desenha os quatro ícones, o raio da marca e o QR diretamente no ca
 ## Centro de ajuda
 
 Página pública e responsiva, independente do login, com tokens Voltz, três cartões de tema, FAQ expansível e CTA para email de suporte. O link surge também no ecrã de autenticação e no Perfil.
+
+## Páginas legais
+
+Privacidade e Termos têm URLs e páginas próprios, com cabeçalho navegável, secções de leitura, ligações cruzadas, foco visível e layout móvel. Avisos amarelos identificam os dados jurídicos ainda por completar; não devem ser removidos sem confirmação factual do operador.
