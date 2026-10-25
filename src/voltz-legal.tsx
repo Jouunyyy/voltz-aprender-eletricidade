@@ -2,6 +2,8 @@ import { ArrowLeft, ArrowUpRight, Mail, ShieldCheck, Zap } from "lucide-react";
 
 const base = import.meta.env.BASE_URL;
 const supportEmail = "voltz@midiahost.pt";
+const operatorName = "João Rafael Carvalho da Silva";
+const operatorPostcode = "4705-629";
 const privacyHref = `${base}privacidade.html`;
 const termsHref = `${base}termos.html`;
 const supportHref = `${base}apoio.html`;
@@ -38,9 +40,9 @@ function PrivacyPolicy() {
       <p>Explica que dados o Voltz utiliza, para quê, e como podes exercer os teus direitos.</p>
       <small>Atualizada em {updated}</small>
     </div>
-    <div className="legal-notice" role="note"><strong>Identificação do responsável por completar.</strong> O email de contacto está ativo, mas esta página precisa do nome legal e da morada postal da pessoa ou entidade que opera o Voltz antes de ser considerada informação jurídica completa. Contacto atual: <a href={`mailto:${supportEmail}`}>{supportEmail}</a>.</div>
+    <div className="legal-notice" role="note"><strong>Responsável pelo Voltz:</strong> {operatorName}, pessoa singular. Contacto: <a href={`mailto:${supportEmail}`}>{supportEmail}</a>. Código postal indicado: {operatorPostcode}. Por privacidade, não é publicada aqui uma morada residencial completa. O código postal não substitui um endereço geográfico completo quando este for legalmente exigido.</div>
     <article className="legal-content">
-      <section><h2>1. Quem trata os dados</h2><p>O Voltz — Aprender Eletricidade é um projeto educativo online. O responsável pelo tratamento dos dados deve ser identificado pelo seu nome legal e morada postal nesta secção. Para questões de privacidade, escreve para <a href={`mailto:${supportEmail}`}>{supportEmail}</a>.</p><p>O Voltz não indica, nesta versão, um encarregado da proteção de dados. Se a lei exigir a sua designação, os respetivos contactos serão publicados aqui.</p></section>
+      <section><h2>1. Quem trata os dados</h2><p>O Voltz — Aprender Eletricidade é um projeto educativo online operado por {operatorName}, pessoa singular. Contacto para assuntos de dados pessoais: <a href={`mailto:${supportEmail}`}>{supportEmail}</a>.</p><p>O Voltz não indica, nesta versão, um encarregado da proteção de dados. Se a lei exigir a sua designação, os respetivos contactos serão publicados aqui.</p></section>
       <section><h2>2. Dados que utilizamos</h2><ul>
         <li><strong>Conta e autenticação:</strong> email, identificador de conta, nome indicado no registo e dados básicos recebidos do Google quando escolhes entrar por esse serviço, como nome e imagem de perfil. As palavras-passe são tratadas pelo serviço de autenticação e não são guardadas pelo Voltz em texto legível.</li>
         <li><strong>Aprendizagem:</strong> níveis concluídos, progresso, XP, sequência de utilização, progresso de videoaulas e respostas/atividade necessárias às funcionalidades pedagógicas e às ferramentas de turma.</li>
@@ -73,7 +75,7 @@ function TermsOfService() {
       <p>Regras de acesso e utilização do Voltz — Aprender Eletricidade.</p>
       <small>Atualizados em {updated}</small>
     </div>
-    <div className="legal-notice" role="note"><strong>Identificação do operador por completar.</strong> Antes de lançar subscrições ou outros pagamentos, esta página deve indicar o nome legal e a morada postal do profissional responsável, além das condições comerciais aplicáveis. Contacto atual: <a href={`mailto:${supportEmail}`}>{supportEmail}</a>.</div>
+    <div className="legal-notice" role="note"><strong>Operador:</strong> {operatorName}, pessoa singular. Contacto: <a href={`mailto:${supportEmail}`}>{supportEmail}</a>. Código postal indicado: {operatorPostcode}. Não é publicada uma morada residencial completa. O código postal não equivale a um endereço geográfico completo; por isso, as subscrições e pagamentos do Voltz permanecem indisponíveis até a informação legal necessária poder ser apresentada de forma adequada.</div>
     <article className="legal-content">
       <section><h2>1. Sobre o serviço</h2><p>O Voltz é uma plataforma educativa de apoio à aprendizagem de fundamentos de eletricidade. Disponibiliza percurso, manual, exercícios, demonstrações, videoaulas, perfil, ferramentas de turma e certificados, conforme a disponibilidade e o tipo de conta.</p><p>O serviço destina-se a aprendizagem e apoio pedagógico. Os circuitos e laboratórios são demonstrações educativas: não substituem formação prática supervisionada, avaliação de risco, normas aplicáveis nem o trabalho de um profissional qualificado.</p></section>
       <section><h2>2. Conta e utilização responsável</h2><ul>
@@ -89,7 +91,7 @@ function TermsOfService() {
       <section><h2>7. Disponibilidade e alterações</h2><p>O Voltz pode ser atualizado para corrigir erros, melhorar a segurança ou acrescentar funcionalidades. Procuramos manter o acesso disponível, mas podem ocorrer interrupções por manutenção, falhas de rede ou de fornecedores. Se uma área ficar indisponível, tenta novamente mais tarde ou contacta o suporte.</p><p>Alterações materiais a estes Termos serão publicadas nesta página com nova data. Se uma alteração afetar uma funcionalidade paga no futuro, será comunicada antes de produzir efeitos para os utilizadores abrangidos, sem prejuízo dos direitos legais.</p></section>
       <section><h2>8. Suspensão e encerramento</h2><p>Podemos limitar ou suspender uma conta quando tal seja necessário para proteger o serviço, outros utilizadores ou cumprir a lei, especialmente em caso de abuso ou violação destes Termos. Sempre que possível, explicaremos o motivo e como pedir revisão. Podes deixar de usar o Voltz e solicitar o encerramento da conta através do apoio.</p></section>
       <section><h2>9. Responsabilidade e direitos legais</h2><p>O Voltz não substitui instrução prática supervisionada nem deve ser usado como única fonte para executar trabalhos elétricos reais. Segue sempre as regras de segurança e a legislação aplicável. Nada nestes Termos exclui ou reduz direitos que a lei não permita limitar, incluindo direitos dos consumidores.</p></section>
-      <section><h2>10. Lei aplicável e contacto</h2><p>Estes Termos regem-se pela lei portuguesa, sem prejuízo das normas imperativas de proteção do consumidor aplicáveis. Para questões ou reclamações, contacta <a href={`mailto:${supportEmail}?subject=${encodeURIComponent("Questão sobre os Termos Voltz")}`}>{supportEmail}</a> ou consulta a <a href={supportHref}>área de apoio</a>.</p><p>Os meios de resolução alternativa de litígios de consumo aplicáveis e a identificação legal completa do operador serão indicados antes da disponibilização de qualquer serviço pago.</p></section>
+      <section><h2>10. Lei aplicável e contacto</h2><p>Estes Termos regem-se pela lei portuguesa, sem prejuízo das normas imperativas de proteção do consumidor aplicáveis. Para questões ou reclamações, contacta <a href={`mailto:${supportEmail}?subject=${encodeURIComponent("Questão sobre os Termos Voltz")}`}>{supportEmail}</a> ou consulta a <a href={supportHref}>área de apoio</a>.</p><p>Antes da disponibilização de qualquer serviço pago serão publicados os dados de identificação e contacto exigidos, a informação pré-contratual completa e os meios de resolução alternativa de litígios de consumo aplicáveis. O código postal, por si só, não constitui uma morada geográfica completa.</p></section>
     </article>
   </>;
 }
