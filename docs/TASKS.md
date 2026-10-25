@@ -1,6 +1,6 @@
 # Tarefas
 
-Atualizado: 2026-10-24. Backlog não equivale a autorização para executar todas as entradas. Escolher a tarefa em função do pedido atual.
+Atualizado: 2026-10-25. Backlog não equivale a autorização para executar todas as entradas. Escolher a tarefa em função do pedido atual.
 
 ## Pendentes
 
@@ -49,3 +49,9 @@ Faísca completa em WebP; mensagem, QR e assinatura em zonas distintas. Download
 ## Alinhamento dos símbolos no PDF — 2026-10-25
 
 Exportação desenha os quatro ícones, o raio da marca e o QR diretamente no canvas, a partir das caixas do DOM clonado sem escala. Evita dependência da baseline de emojis e de object-fit/bordas no html2canvas. QR quadrado com margem branca simétrica, sem interpolação; ligação clicável acompanha a sua caixa real. O HTML visível não foi alterado. Typecheck, 34 testes e build locais passaram; confirmar exportação e deploy do commit antes de declarar publicação. Safari físico ainda não testado.
+
+## Otimização — 2026-10-25
+
+- [x] Favicon adaptado à base e carregamento diferido do VoltzRoot; typecheck, 34 testes e ambos os builds passaram.
+- [ ] Publicar no MidiaHost após renovar sessão cPanel e preservar regras locais; verificar cabeçalhos de compressão/cache e recursos no domínio real.
+- [ ] Medir Lighthouse/Core Web Vitals e validar navegação autenticada/Safari após publicação.

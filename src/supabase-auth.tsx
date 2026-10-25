@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { AtSign, Eye, EyeOff, LockKeyhole, Mail, Zap } from "lucide-react";
-import VoltzRoot, { type VoltzRole } from "./voltz-root";
+import type { VoltzRole } from "./voltz-root";
 import { reportTelemetry } from "./telemetry";
 import { getValidAccessToken, SUPABASE_KEY, SUPABASE_URL, writeStoredSession } from "./supabase-client";
 import { initializeAuth, finishRecovery, signOut, startSessionRefresh } from "./auth-session";
 import { appRedirect, emailAuthPath } from "./auth-redirect";
+
+const VoltzRoot = lazy(() => import("./voltz-root"));
 export { SUPABASE_KEY, SUPABASE_URL } from "./supabase-client";
 
 export type AuthUser={id:string;email:string;name:string;avatar?:string};
@@ -40,7 +42,7 @@ export default function AuthApp(){
  if(!session)return <AuthScreen onSession={setSession} initialError={authError}/>;
  if(recovery)return <UpdatePassword session={session} onDone={()=>{finishRecovery();setRecovery(false)}}/>;
  const user=mapUser(session);
- return <VoltzRoot user={user} role={role} loadRemote={()=>loadCloudProgress(session,user.id)} saveRemote={async data=>{await saveCloudProgress(session,user.id,data);await syncEmailPreferences(session,user)}} emailConsent={emailConsent} emailPreferencesReady={emailPreferencesReady} onEmailConsent={async consent=>{await syncEmailPreferences(session,user,consent);setEmailConsent(consent)}} onSendEmailTests={()=>sendEmailTests(session)} adminRequest={(action,input)=>adminRequest(session,action,input)} onSignOut={async()=>{const pending=signOut();setSession(null);setRole("user");await pending}}/>
+ return <Suspense fallback={<div className="auth-loading" role="status">A abrir o Voltz…</div>}><VoltzRoot user={user} role={role} loadRemote={()=>loadCloudProgress(session,user.id)} saveRemote={async data=>{await saveCloudProgress(session,user.id,data);await syncEmailPreferences(session,user)}} emailConsent={emailConsent} emailPreferencesReady={emailPreferencesReady} onEmailConsent={async consent=>{await syncEmailPreferences(session,user,consent);setEmailConsent(consent)}} onSendEmailTests={()=>sendEmailTests(session)} adminRequest={(action,input)=>adminRequest(session,action,input)} onSignOut={async()=>{const pending=signOut();setSession(null);setRole("user");await pending}}/></Suspense>
 }
 
 function UpdatePassword({session,onDone}:{session:AuthSession;onDone:()=>void}){const [password,setPassword]=useState("");const [busy,setBusy]=useState(false);const [error,setError]=useState("");async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setError("");try{const access=await getValidAccessToken();const response=await fetch(`${SUPABASE_URL}/auth/v1/user`,{method:"PUT",headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${access}`,"Content-Type":"application/json"},body:JSON.stringify({password})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.message||"Não foi possível alterar a palavra-passe.");onDone()}catch(err){setError(err instanceof Error?err.message:"Ocorreu um erro.")}finally{setBusy(false)}}return <main className="auth-page"><section className="auth-brand"><div className="auth-logo"><Zap fill="currentColor"/> Voltz</div><h1>Cria uma nova<br/>palavra-passe.</h1><p>Escolhe uma palavra-passe segura para voltares às tuas aulas.</p></section><section className="auth-panel"><span className="eyebrow">Recuperação de conta</span><h2>Nova palavra-passe</h2><form onSubmit={submit}><label><span><LockKeyhole/> Palavra-passe</span><input type="password" autoComplete="new-password" minLength={8} required value={password} onChange={e=>setPassword(e.target.value)} placeholder="Mínimo 8 caracteres"/></label>{error&&<p className="auth-error" role="alert">{error}</p>}<button className="primary-button auth-submit" disabled={busy}>{busy?"A guardar…":"Guardar e continuar"}</button></form></section></main>}

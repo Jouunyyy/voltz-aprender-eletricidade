@@ -1,6 +1,6 @@
 # Memória técnica do projeto
 
-Última atualização: 2026-10-24. Este ficheiro é contexto persistido no repositório; só ajuda uma sessão que o consulte. Não contém credenciais nem substitui o código ou logs de produção.
+Última atualização: 2026-10-25. Este ficheiro é contexto persistido no repositório; só ajuda uma sessão que o consulte. Não contém credenciais nem substitui o código ou logs de produção.
 
 ## Estado de referência
 
@@ -82,3 +82,10 @@ Faísca completa em WebP; mensagem, QR e assinatura em zonas distintas. Download
 ## Alinhamento dos símbolos no PDF — 2026-10-25
 
 Exportação desenha os quatro ícones, o raio da marca e o QR diretamente no canvas, a partir das caixas do DOM clonado sem escala. Evita dependência da baseline de emojis e de object-fit/bordas no html2canvas. QR quadrado com margem branca simétrica, sem interpolação; ligação clicável acompanha a sua caixa real. O HTML visível não foi alterado. Typecheck, 34 testes e build locais passaram; confirmar exportação e deploy do commit antes de declarar publicação. Safari físico ainda não testado.
+
+## Otimização de entrada — 2026-10-25
+
+- Favicon usa `%BASE_URL%`, compatível com GitHub Pages e domínio na raiz.
+- VoltzRoot é carregado depois da autenticação através de React.lazy/Suspense. No build de raiz, JS inicial referenciado pelo HTML passou de cerca de 619 KB para 256 KB sem compressão; não é uma medição de tempo real no telemóvel.
+- public/.htaccess propõe DEFLATE para texto, HTML revalidado, cache de 1 ano para JS/CSS com hash e 1 dia para imagens/fontes. No alojamento existente, inspecionar e preservar regras locais antes de instalar; configuração ainda não confirmada em produção.
+- Typecheck, 34 testes e builds com base Pages e `/` passaram. Não foi realizado Lighthouse nem teste Safari nesta intervenção. A sessão cPanel expirou por mudança de IP antes do upload; publicação MidiaHost pendente.
