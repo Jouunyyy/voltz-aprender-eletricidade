@@ -89,3 +89,7 @@ Exportação desenha os quatro ícones, o raio da marca e o QR diretamente no ca
 - VoltzRoot é carregado depois da autenticação através de React.lazy/Suspense. No build de raiz, JS inicial referenciado pelo HTML passou de cerca de 619 KB para 256 KB sem compressão; não é uma medição de tempo real no telemóvel.
 - public/.htaccess propõe DEFLATE para texto, HTML revalidado, cache de 1 ano para JS/CSS com hash e 1 dia para imagens/fontes. No alojamento existente, inspecionar e preservar regras locais antes de instalar; configuração ainda não confirmada em produção.
 - Typecheck, 34 testes e builds com base Pages e `/` passaram. Não foi realizado Lighthouse nem teste Safari nesta intervenção. A sessão cPanel expirou por mudança de IP antes do upload; publicação MidiaHost pendente.
+
+## Planos no Perfil — 2026-10-25
+
+Apresentação Free/Pro/Escolas por baixo do nome, com diálogo de comparação responsivo. Preços: Free 0 €, Pro 3,99 €/mês ou 29,99 €/ano, Escolas 550 €/ano. Nesta fase todas as contas são apresentadas como Free: não existe subscrição paga integrada. Não inferir plano a partir das roles. Sem cobrança, alteração de acesso ou bloqueio do percurso/certificado. Adesões pagas, resolução do plano no servidor e limites Live pendentes.

@@ -40,3 +40,7 @@ Ensinar fundamentos de eletricidade e segurança elétrica através de aulas vis
 ## Limites e evolução
 
 Não há integração LLM identificada no código analisado. O progresso individual é enviado pelo cliente; a plataforma não deve ser apresentada como avaliação antifraude. A presença de 50 níveis não equivale a revisão pedagógica integral. Melhorias propostas e bloqueios estão em [TASKS](TASKS.md); não são compromissos implementados.
+
+## Planos no Perfil — 2026-10-25
+
+Apresentação Free/Pro/Escolas por baixo do nome, com diálogo de comparação responsivo. Preços: Free 0 €, Pro 3,99 €/mês ou 29,99 €/ano, Escolas 550 €/ano. Nesta fase todas as contas são apresentadas como Free: não existe subscrição paga integrada. Não inferir plano a partir das roles. Sem cobrança, alteração de acesso ou bloqueio do percurso/certificado. Adesões pagas, resolução do plano no servidor e limites Live pendentes.
