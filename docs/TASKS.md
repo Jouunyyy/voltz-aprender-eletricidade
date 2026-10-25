@@ -59,3 +59,8 @@ Exportação desenha os quatro ícones, o raio da marca e o QR diretamente no ca
 ## Planos no Perfil — 2026-10-25
 
 Apresentação Free/Pro/Escolas por baixo do nome, com diálogo de comparação responsivo. Preços: Free 0 €, Pro 3,99 €/mês ou 29,99 €/ano, Escolas 550 €/ano. Nesta fase todas as contas são apresentadas como Free: não existe subscrição paga integrada. Não inferir plano a partir das roles. Sem cobrança, alteração de acesso ou bloqueio do percurso/certificado. Adesões pagas, resolução do plano no servidor e limites Live pendentes.
+
+
+## Centro de ajuda e suporte — 2026-10-25
+
+- [x] Página pública `apoio.html`, com FAQ e links de email para aprendizagem, pagamentos e conta; ligada ao login e Perfil. Sem backend de tickets. Typecheck, testes e build verificados localmente nesta alteração; deploy ainda não confirmado.

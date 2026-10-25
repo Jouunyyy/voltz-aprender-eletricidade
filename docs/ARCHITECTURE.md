@@ -63,3 +63,8 @@ O deploy de `voltz-live` deve incluir `src/learning/*.ts`, `src/quiz.ts`, `src/c
 ### Carregamento inicial e cache
 
 O AuthApp carrega VoltzRoot por import dinâmico apenas para uma sessão autenticada, com fallback acessível em Suspense. O favicon usa a base do Vite. Para Apache, `public/.htaccess` define compressão e cache de recursos estáticos; não é aplicado pelo GitHub Pages. O destino MidiaHost é `/home/midiahos/subD/Voltz`, com `VOLTZ_BASE=/`. Preservar/combinar configurações existentes do servidor antes de instalar esse ficheiro.
+
+
+## Página pública de suporte
+
+`apoio.html` é uma entrada Vite independente, compilada para `apoio.html` no mesmo deployment do site. `src/support-main.tsx` monta a página sem inicializar Auth ou Supabase; `src/voltz-support.tsx` contém perguntas frequentes e links `mailto:`. O URL funciona tanto sob a base GitHub Pages como na raiz de um domínio próprio. Não há API, sistema de tickets ou promessa de envio/receção de resposta.

@@ -44,3 +44,8 @@ Não há integração LLM identificada no código analisado. O progresso individ
 ## Planos no Perfil — 2026-10-25
 
 Apresentação Free/Pro/Escolas por baixo do nome, com diálogo de comparação responsivo. Preços: Free 0 €, Pro 3,99 €/mês ou 29,99 €/ano, Escolas 550 €/ano. Nesta fase todas as contas são apresentadas como Free: não existe subscrição paga integrada. Não inferir plano a partir das roles. Sem cobrança, alteração de acesso ou bloqueio do percurso/certificado. Adesões pagas, resolução do plano no servidor e limites Live pendentes.
+
+
+## Centro de ajuda e suporte — 2026-10-25
+
+Página pública em `/apoio.html`, acessível sem sessão, com contactos por email e respostas sobre acesso, progresso, segurança e planos. O contacto usa `mailto:voltz@midiahost.pt`; não existe submissão de tickets nem armazenamento de pedidos no site. A área informa que as adesões pagas ainda não estão ativas.
